@@ -1,0 +1,20 @@
+@{
+    ViewData["Title"] = "All Products";
+}
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    @{
+        var item = ViewBag.item;
+        foreach (var i in item)
+        {
+            <h4>
+                <a href="product/detail/@i.id">@i.name</a>
+            </h4>
+            <h5>@i.desc</h5>
+            <a href="product/detail/@i.id">
+                <img src=@i.img_url class="img-grid">
+            </a>
+        }
+    }
+</div>

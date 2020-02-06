@@ -1,0 +1,36 @@
+@{
+    ViewData["Title"] = "All itemin cart";
+}
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    @{
+        var items = ViewBag.Items;
+        foreach (var item in items)
+        {
+            <h4>@item.name</h4>
+            <img src=@item.img_url class="img-grid">
+            <h5>jumlah :</h5>    
+            <input id="input-@item.id" type="text" name="jumlah" value="@item.qty">
+            <br>
+            <input id="btn-@item.id" type="button"
+                value="Update"
+                onclick="javascript: submitUpdate(this)" />
+            <h5>subtotal : @item.totItemPrice</h5>
+        }
+    }
+</div>
+
+
+<script type="text/javascript">
+    function submitUpdate(btn)
+    {
+        var id = btn.id
+        id = id.substring(4, id.length);
+        var inputId = 'input-'+ id;
+        console.log(inputId);
+        var val = document.getElementById(inputId).value;
+        var url = "https://localhost:5001/Cart/update?id=" + id + "&val:" + val;
+        window.location.href = url;
+    }    
+</script>
