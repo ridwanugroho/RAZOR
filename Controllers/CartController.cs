@@ -24,12 +24,14 @@ namespace belajarRazor.Controllers
         {
             if(appDbContex.Cart.Any())
             {
-                var cart = from _cart in appDbContex.Cart.Include(i=>i.Items).ThenInclude(b=>b.Barang) where _cart.id == 1 select _cart;
-                var items = generateItemToLoad(cart.First());
-                ViewBag.Items = items;
+                var items = from item in appDbContex.Items.Include(b=>b.Barang) select item;
+                var  itemList = generateItemToLoad(items.ToList());
+                var totalPrice = calculateTotal(itemList);
+                ViewBag.Items = itemList;
+                ViewBag.totalPrice = totalPrice;
             }
 
-            return View("allCarts");
+            return View("AllCarts");
         }
 
         public IActionResult Add(int id)
@@ -56,7 +58,7 @@ namespace belajarRazor.Controllers
             else
             {
                 if(appDbContex.Items.Any(i=>i.Barang == barang))
-                    return RedirectToAction("Index", "Home");
+                    return View("CartConfirmNo");
 
                 var cart = appDbContex.Cart.Find(1);
                 cart.Items = new List<Item>(){item};
@@ -69,30 +71,51 @@ namespace belajarRazor.Controllers
 
         public IActionResult update(int id, int val)
         {
-            
-            return Ok();
+            Console.WriteLine(id);
+            Console.WriteLine(val);
+            var item = appDbContex.Items.Find(id);
+            item.qty = val;
+            appDbContex.SaveChanges();
+
+            return RedirectToAction("Index", "Cart");
         }
 
-        private List<CartItemToView> generateItemToLoad(Cart cart)
+        public IActionResult Remove(int id)
         {
-            
+            var itemToRemove = appDbContex.Items.Find(id);
+            appDbContex.Items.Remove(itemToRemove);
+            appDbContex.SaveChanges();
+
+            return RedirectToAction("Index", "Cart");
+        }
+
+        private List<CartItemToView> generateItemToLoad(List<Item> items)
+        {   
             var cartList = new List<CartItemToView>();
 
-            var barang = cart.Items.GroupBy(x=>x.Barang);
-
-            foreach (var b in barang)
+            foreach (var item in items)
             {
                 cartList.Add(new CartItemToView()
                             {
-                                id= b.Key.id,
-                                name = b.Key.name,
-                                qty = b.Count(),
-                                totItemPrice = b.Key.price * b.Count(),
-                                img_url = b.Key.img_url
+                                id= item.id,
+                                name = item.Barang.name,
+                                qty = item.qty,
+                                totItemPrice = item.Barang.price * item.qty,
+                                img_url = item.Barang.img_url
                             });
             }
             
             return cartList;
+        }
+
+        private double calculateTotal(List<CartItemToView> items)
+        {
+            var totalPrice = items.Select(t => t.totItemPrice).Sum();
+            var cart = appDbContex.Cart.Find(1);
+            cart.totalPrice = totalPrice;
+            appDbContex.SaveChanges();
+
+            return totalPrice;
         }
     }
 
