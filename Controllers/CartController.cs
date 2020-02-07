@@ -100,6 +100,7 @@ namespace belajarRazor.Controllers
                                 id= item.id,
                                 name = item.Barang.name,
                                 qty = item.qty,
+                                itemPrice = item.Barang.price,
                                 totItemPrice = item.Barang.price * item.qty,
                                 img_url = item.Barang.img_url
                             });
@@ -125,6 +126,7 @@ namespace belajarRazor.Controllers
         public int id{get; set;}
         public string name{get; set;} = "null";
         public int qty{get; set;} = 0;
+        public double itemPrice{get; set;} = 0;
         public double totItemPrice{get; set;} = 0;
         public string img_url{get; set;} = "";
     }

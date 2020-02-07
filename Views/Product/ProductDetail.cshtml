@@ -3,15 +3,15 @@
     ViewBag.Title = "Index";
 }
 
-<div class="text-center">
+<div>
     @{
         var item = ViewBag.item;
     }
-    <div class="row">
-        <div class="column">
-            <img src=@item.img_url class="img-grid">
+    <div class="prod-list-table">
+        <div class="">
+            <img src=@item.img_url class="img-grid-detail">
         </div>
-        <div class="column">
+        <div class="">
             <h4>@item.name</h4>
             <h5>Rp @item.price</h5>
             <h5>@item.desc</h5>

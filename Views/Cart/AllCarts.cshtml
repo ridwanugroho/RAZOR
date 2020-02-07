@@ -3,24 +3,32 @@
 }
 <h1>@ViewData["Title"]</h1>
 
-<div>
+<div class="">
     @{
         var items = ViewBag.Items;
-        foreach (var item in items)
+        foreach (var i in items)
         {
-            <h4>@item.name</h4>
-            <img src=@item.img_url class="img-grid">
-            <h5>jumlah :</h5>    
-            <input id="input-@item.id" type="text" name="jumlah" value="@item.qty">
-            <br>
-            <input id="btn-@item.id" type="button" value="Update" onclick="javascript: submitUpdate(this)" />
-            <input id="btnRmv-@item.id" type="button" value="Remove" onclick="javascript: removeItem(this)" />
-            <h5>subtotal : @item.totItemPrice</h5>
+            <div class="prod-list prod-list-table">
+                <div id="img-holder-@i.id" style="margin: auto">
+                    <a href="product/detail/@i.id">
+                        <img src=@i.img_url class="img-grid">
+                    </a>
+                </div>
+                <div class="prod-desc">
+                    <h5>@i.name (Rp @i.itemPrice)</h5>
+                    <h5>Jumlah :</h5>
+                    <input id="input-@i.id" type="text" class="" value="@i.qty" size="17" style="margin-bottom:5px"><br>
+                    <input id="btn-@i.id" type="button" class="btn btn-success" value="Update" onclick="javascript: submitUpdate(this)" />
+                    <input id="btnRmv-@i.id" type="button" class="btn btn-danger" value="Remove" onclick="javascript: removeItem(this)" /><br><br>
+                    <h5>Subtotal : @i.totItemPrice</h5>
+                </div>
+                <div>
+                </div>
+            </div>
         }
     }
     <h2>Total Price : @ViewBag.totalPrice</h2>
 </div>
-
 
 <script type="text/javascript">
     function submitUpdate(btn)

@@ -23,7 +23,7 @@ namespace belajarRazor.Controllers
 
         public IActionResult Index()
         {
-            var items = from i in appDbContex.Barang select i;
+            var items = from i in appDbContex.Barang where i.rating>6 select i;
             ViewBag.item = items;
             
             return View();
