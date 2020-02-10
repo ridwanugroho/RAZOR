@@ -59,7 +59,9 @@ namespace belajarRazor.Controllers
                 desc = _product["desc"],
                 img_url = _product["img_url"],
                 price = Convert.ToDouble(_product["price"]),
-                rating = Convert.ToInt32(_product["rating"])
+                rating = Convert.ToInt32(_product["rating"]),
+                createdAt = DateTime.Now,
+                editedAt = DateTime.Now
             };
 
             appDbContex.Barang.Add(product);
@@ -73,6 +75,7 @@ namespace belajarRazor.Controllers
         {
             var product = appDbContex.Barang.Find(id);
             ViewBag.item = product;
+
 
             return View();
         }
@@ -88,6 +91,8 @@ namespace belajarRazor.Controllers
                 var prop = typeof(Barang).GetProperty(item);
                 prop.SetValue(productToUpdate, prop.GetValue(_product, null));
             }
+
+            productToUpdate.editedAt = DateTime.Now;
 
             appDbContex.SaveChanges();
 

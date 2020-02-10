@@ -1,3 +1,5 @@
+using System;
+
 
 namespace belajarRazor.Models
 {
@@ -9,5 +11,7 @@ namespace belajarRazor.Models
         public string img_url{get; set;}
         public double price{get; set;}
         public int rating{get; set;}
+        public DateTime createdAt{get; set;}
+        public DateTime editedAt{get; set;}
     }
 }

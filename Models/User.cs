@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace belajarRazor.Models
@@ -9,7 +10,8 @@ namespace belajarRazor.Models
         public string email{get; set;}
         public string password{get; set;}
         public int authLevel{get; set;}
-
+        public DateTime createdAt{get; set;}
+        public DateTime updatedAt{get; set;}
         public ICollection<Cart> Carts{get; set;}
     }
 }

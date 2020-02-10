@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace belajarRazor.Models
@@ -6,6 +7,8 @@ namespace belajarRazor.Models
     {
         public int id{get; set;}
         public double totalPrice{get; set;}
+        public DateTime createdAt{get; set;}
+        public DateTime editedAt{get; set;}
 
         public virtual ICollection<Item> Items{get; set;}
 
