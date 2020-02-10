@@ -88,9 +88,12 @@ namespace belajarRazor.Controllers
         {
             var _user = new User()
             {
-                username = user_inp["username"],
+                email = user_inp["email"],
                 password = user_inp["password"]
             };
+
+            Console.WriteLine(_user.email);
+            Console.WriteLine(_user.password);
 
             var user = AuthenticatedUser(_user);
 
@@ -119,7 +122,7 @@ namespace belajarRazor.Controllers
 
         public User AuthenticatedUser(User user_input)
         {
-            var user = from _user in appDbContex.User where _user.username == user_input.username select _user;
+            var user = from _user in appDbContex.User where _user.email == user_input.email select _user;
 
             if(user.FirstOrDefault() != null)
             {

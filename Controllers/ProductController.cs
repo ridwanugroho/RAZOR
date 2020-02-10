@@ -94,6 +94,16 @@ namespace belajarRazor.Controllers
             return RedirectToAction("Index", "Product");
         }
 
+        [Authorize]
+        public IActionResult Delete(int id)
+        {
+            var productToDel = appDbContex.Barang.Find(id);
+            appDbContex.Barang.Remove(productToDel);
+            appDbContex.SaveChanges();
+
+            return RedirectToAction("Index", "Product");
+        }
+
         private int getAuth()
         {
             if(HttpContext.Session.GetString("JWToken") != null)
