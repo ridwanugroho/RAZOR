@@ -1,0 +1,32 @@
+</h4>
+@using (Html.BeginForm("AddProduct", "Product", FormMethod.Post))
+{
+    <table>
+        <tr>
+            <td>Nama produk: </td>
+            <td>@Html.TextBox("name")</td>
+        </tr>
+        <tr>
+            <td>Deskripsi: </td>
+            <td>@Html.TextBox("desc")</td>
+        </tr>
+        <tr>
+            <tr>
+            <td>Gambar: </td>
+            <td>@Html.TextBox("img_url")</td>
+        </tr>
+        <tr>
+            <td>Harga: </td>
+            <td>@Html.TextBox("price")</td>
+        </tr>
+        <tr>
+            <td>Rating: </td>
+            <td>@Html.TextBox("rating")</td>
+        </tr>
+        <tr>
+        <tr>
+        <tr>
+            <td colspan="2"><input type="submit" value="Submit"></td>
+        </tr>
+    </table>
+}

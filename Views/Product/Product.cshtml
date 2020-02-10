@@ -4,6 +4,7 @@
 
 <div class="">
     <h2 class="text-center">All Products</h2>
+    @if(ViewBag.auth == 1){<a href="https://localhost:5001/product/add">Add</a>}
     @{
         var item = ViewBag.item;
         foreach (var i in item)
@@ -17,12 +18,29 @@
                 <div class="prod-desc">
                     <h4>Rp @i.price</h4><br>
                     <h5><a href="product/detail/@i.id">@i.name</a></h5>
-                    @i.desc
+                    <div id="desc-@i.id">@i.desc</div>
+                    @if(ViewBag.auth == 1){
+                        <div id="rat-@i.id">Rating : @i.rating</div>
+                    }
                 </div>
                 <div>
-                    <a href="https://localhost:5001/cart/add/@i.id">
-                        <img src="cart.png" class="cart-btn">
-                    </a>
+                    @{
+                        if(ViewBag.auth == 0)
+                        {
+                            <a href="https://localhost:5001/cart/add/@i.id">
+                            <img src="cart.png" class="cart-btn">
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="https://localhost:5001/product/edit/@i.id">
+                                <img src="edit.png" class="cart-btn">
+                            </a>
+                            <a href="https://localhost:5001/product/delete/@i.id">
+                                <img src="delete.png" class="cart-btn">
+                            </a>
+                        }
+                    }
                 </div>
             </div>
         }

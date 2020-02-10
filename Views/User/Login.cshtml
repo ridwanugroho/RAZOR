@@ -1,0 +1,23 @@
+<h3><b>Login</b></h3>
+@{
+    var info = ViewBag.info;
+}
+<h4 style="coloe: red">
+    @info
+</h4>
+@using (Html.BeginForm("Login", "User", FormMethod.Post))
+{
+    <table>
+        <tr>
+            <td>Enter username: </td>
+            <td>@Html.TextBox("username")</td>
+        </tr>
+        <tr>
+            <td>Enter password: </td>
+            <td>@Html.Password("password")</td>
+        </tr>
+        <tr>
+            <td colspan="2"><input type="submit" value="Submit"></td>
+        </tr>
+    </table>
+}

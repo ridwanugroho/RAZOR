@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+
 using belajarRazor.Models;
 using belajarRazor.Data;
 
@@ -29,6 +32,7 @@ namespace belajarRazor.Controllers
                 var totalPrice = calculateTotal(itemList);
                 ViewBag.Items = itemList;
                 ViewBag.totalPrice = totalPrice;
+                ViewBag.auth = getAuth();
             }
 
             return View("AllCarts");
@@ -117,6 +121,15 @@ namespace belajarRazor.Controllers
             appDbContex.SaveChanges();
 
             return totalPrice;
+        }
+    
+        private int getAuth()
+        {
+            if(HttpContext.Session.GetString("JWToken") != null)
+                return 1;
+
+            else
+                return 0;
         }
     }
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Http;
 using belajarRazor.Models;
 using belajarRazor.Data;
 
@@ -25,6 +26,8 @@ namespace belajarRazor.Controllers
         {
             var items = from i in appDbContex.Barang where i.rating>6 select i;
             ViewBag.item = items;
+            ViewBag.auth = getAuth();
+            Console.WriteLine("auth status : {0}", getAuth());
             
             return View();
         }
@@ -38,6 +41,16 @@ namespace belajarRazor.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        private int getAuth()
+        {
+            Console.WriteLine("token : {0}", (HttpContext.Session.GetString("JWToken")));
+            if(HttpContext.Session.GetString("JWToken") != null)
+                return 1;
+
+            else
+                return 0;
         }
     }
 }

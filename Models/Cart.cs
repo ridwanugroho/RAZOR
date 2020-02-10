@@ -8,5 +8,7 @@ namespace belajarRazor.Models
         public double totalPrice{get; set;}
 
         public virtual ICollection<Item> Items{get; set;}
+
+        public User User{get; set;}
     }
 }

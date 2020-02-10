@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,6 +13,10 @@ using Microsoft.EntityFrameworkCore;
 
 using Newtonsoft.Json;
 using belajarRazor.Data;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace belajarRazor
 {
@@ -27,6 +32,13 @@ namespace belajarRazor
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSession(options => 
+            {
+                options.IdleTimeout = TimeSpan.FromHours(3);
+            });       
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
             services.AddControllers().AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
@@ -36,6 +48,27 @@ namespace belajarRazor
             {
                 options.UseSqlServer(Configuration.GetConnectionString("localhost1"));
             });
+
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                    
+                };
+            });
+
             services.AddControllersWithViews();
         }
 
@@ -52,11 +85,25 @@ namespace belajarRazor
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
+            app.UseCookiePolicy();
+            app.UseSession();
 
+            app.Use(async (context, next) =>
+            {           
+                var JWToken = context.Session.GetString("JWToken");
+                Console.WriteLine("saved token : {0}", JWToken);
+                if (!string.IsNullOrEmpty(JWToken))
+                    {
+                        context.Request.Headers.Add("Authorization", "Bearer " + JWToken);
+                    }
+                    await next();
+            });
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
