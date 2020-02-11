@@ -24,7 +24,7 @@ namespace belajarRazor.Controllers
             this.appDbContex = appDbContex;
         }
 
-        public IActionResult Index(int? page, int ? order, string filter="")
+        public IActionResult Index(int ? perpage, int? page, int ? order, string filter="")
         {
             var items1 = new List<Barang>();
 
@@ -48,8 +48,13 @@ namespace belajarRazor.Controllers
             ViewBag.auth = getAuth();
             ViewBag.order = order;
             ViewBag.filter = filter;
+            ViewBag.perPage = perpage;
 
-			var pager = new Pager(items1.Count(), page);
+            int _perPage = 5;
+            if(perpage.HasValue)
+                _perPage = perpage.Value;
+
+			var pager = new Pager(items1.Count(), page, _perPage);
 			
 			var viewModel = new IndexViewModel
 			{

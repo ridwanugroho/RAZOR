@@ -30,7 +30,7 @@
             <form>
                 <input id="searchFilter" type="text" placeholder="search" name="filter" value="@ViewBag.filter">
                 @* <button type="submit">Go</button> *@
-                <input id="order-btn" type="button" class="btn btn-danger" onclick="javascript: search(this)" value="Go" />
+                <input id="search-btn" type="button" class="btn btn-danger" onclick="javascript: setSearch(this)" value="Go" />
             </form>
         </div>
     </div>
@@ -74,37 +74,46 @@
         </div>
     }
     @* pager *@
-    @if(Model.Pager.EndPage>1)
-    {
-        <ul class="pagination">
-            @if(Model.Pager.CurrentPage>1)
+    <div class="pagination-div">
+        <div name="page-list-count">
+            @if(Model.Pager.EndPage>1)
             {
-                <li>
-                    <a href="~/Product/Index">First</a>
-                </li>
-                <li>
-                    <a href="~/Product/Index?page=@(Model.Pager.CurrentPage-1)">Previous</a>
-                </li>
-            }
+                <ul class="pagination">
+                    @if(Model.Pager.CurrentPage>1)
+                    {
+                        <li>
+                            <a href="~/Product/Index?&perpage=@ViewBag.perPage&filter=@ViewBag.filter&order=@ViewBag.order">First</a>
+                        </li>
+                        <li>
+                            <a href="~/Product/Index?page=@(Model.Pager.CurrentPage-1)&perpage=@ViewBag.perPage&filter=@ViewBag.filter&order=@ViewBag.order">Previous</a>
+                        </li>
+                    }
 
-            @for(var p=Model.Pager.StartPage; p<=Model.Pager.EndPage; p++)
-            {
-                <li class="@(p==Model.Pager.CurrentPage ? "active" :"")">
-                    <a href="~/Product/Index?page=@p&filter=@ViewBag.filter&order=@ViewBag.order">@p</a>
-                </li>
-            }
+                    @for(var p=Model.Pager.StartPage; p<=Model.Pager.EndPage; p++)
+                    {
+                        <li class="@(p==Model.Pager.CurrentPage ? "active" :"")">
+                            <a href="~/Product/Index?page=@p&filter=@ViewBag.filter&order=@ViewBag.order&perpage=@ViewBag.perPage">@p</a>
+                        </li>
+                    }
 
-            @if(Model.Pager.CurrentPage<Model.Pager.TotalPages)
-            {
-                <li>
-                    <a href="~/Product/Index?page=@(Model.Pager.CurrentPage + 1)&filter=@ViewBag.filter&order=@ViewBag.order">Next</a>
-                </li>
-                <li>
-                    <a href="~/Product/Index?page=@(Model.Pager.TotalPages)&filter=@ViewBag.filter&order=@ViewBag.order">Last</a>
-                </li>
+                    @if(Model.Pager.CurrentPage<Model.Pager.TotalPages)
+                    {
+                        <li>
+                            <a href="~/Product/Index?page=@(Model.Pager.CurrentPage + 1)&filter=@ViewBag.filter&order=@ViewBag.order&perpage=@ViewBag.perPage">Next</a>
+                        </li>
+                        <li>
+                            <a href="~/Product/Index?page=@(Model.Pager.TotalPages)&filter=@ViewBag.filter&order=@ViewBag.order&perpage=@ViewBag.perPage">Last</a>
+                        </li>
+                    }
+                </ul>
             }
-        </ul>
-    }
+        </div>
+        <div name="per-page-set" style="margin: auto">
+            <input id="item-per-page" type="text" placeholder="..." name="filter" value="@ViewBag.perPage">
+            <input id="page-set-btn" type="button" class="btn btn-danger" onclick="javascript: setItemPerPage(this)" value="Set Page" />
+        </div>
+    </div>
+
 </div>
 
 
@@ -114,31 +123,21 @@
         if(document.getElementById("order-sel").value != 0)
         {
             var filter = '@ViewBag.filter';
+            var perPage = '@ViewBag.perPage'
             var orderVal = document.getElementById("order-sel").value;
             var url = "https://localhost:5001/Product/Index?order=";
-            if(filter != "")
-                url += orderVal + "&filter=" + filter;
-            
-            else
-                url += orderVal;
-
-            console.log(url);
+            url += orderVal + "&filter=" + filter + "&perpage=" + perPage;
             window.location.href = url;
         }
     }
 
-    function search(btn)
+    function setSearch(btn)
     {
         var order = '@ViewBag.order';
+        var perPage = '@ViewBag.perPage'
         var filterVal = document.getElementById("searchFilter").value;
         var url = "https://localhost:5001/Product/Index?filter=";
-        if(order != "")
-            url += filterVal + "&order=" + order;
-
-        else
-            url += filterVal;
-
-        console.log(url);
+        url += filterVal + "&order=" + order + "&perpage=" + perPage;
         window.location.href = url;
     }
 
@@ -149,7 +148,26 @@
             document.getElementById("order-sel").value = selValue;
     }
 
+    function setItemPerPage()
+    {
+        var order = '@ViewBag.order';
+        var filter = '@ViewBag.filter';
+        var perPage = document.getElementById("item-per-page").value;
+        url = "https://localhost:5001/Product/Index?perpage=";
+        url += perPage + "&filter=" + filter + "&order=" + order;
+        window.location.href = url;
+    }
 
     window.onload = setLastOrderVal;
-
+    
+    var input = document.getElementById("searchFilter");
+    input.addEventListener("keyup", function(event) 
+    {
+        if (event.keyCode === 13) 
+        {
+            console.log("enter");
+            event.preventDefault();
+            document.getElementById("search-btn").click();
+        }
+    });
 </script>
