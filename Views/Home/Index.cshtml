@@ -1,63 +1,173 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-    ViewBag.Title = "Index";
+﻿@* {{{{{{{{{{{{{{{{{{{{{{{{{[{{{ data passing using model, not using ViewBag }}}]}}}}}}}}}}}}}}}}}}}}}}}}} *@
+
+@model belajarRazor.Models.IndexViewModel
+
+@{
+    ViewData["Title"] = "Top Products";
 }
 
 <div class="">
     <h2 class="text-center">Our TOP Products</h2>
-    @{
-        var item = ViewBag.item;
-        foreach (var i in item)
-        {
-            <div class="prod-list prod-list-table">
-                <div id="img-holder-@i.id" style="margin: auto">
-                    <a href="product/detail/@i.id">
-                        <img src=@i.img_url class="img-grid">
-                    </a>
-                </div>
-                <div class="prod-desc">
-                    <h4>Rp @i.price</h4>
-                    <h5><a href="product/detail/@i.id">@i.name</a></h5>
-                    @i.desc
-                </div>
-                <div>
-                    <a href="https://localhost:5001/cart/add/@i.id">
-                        <img src="cart.png" class="cart-btn">
-                    </a>
-                </div>
+    <div class="order-opt">
+        <div>
+            <form>
+            <select id="order-sel" name="order-opt">
+                <option value="0">-Ordering type-</option>
+                <option value="1">Lower price</option>
+                <option value="2">Higher price</option>
+                <option value="3">Name ascending</option>
+                <option value="4">Name descending</option>
+                <option value="5">Lastest Created</option>
+                <option value="6">Older Created</option>
+                <option value="7">Lastest Updated</option>
+                <option value="8">Older Update</option>
+            </select>
+            @* <input type="submit" value="Submit"> *@
+            <input id="order-btn" type="button" class="btn btn-danger" onclick="javascript: setOrder(this)" value="Set" />
+        </form>
+        </div>
+        <div>
+            <form>
+                <input id="searchFilter" type="text" placeholder="search" name="filter" value="@ViewBag.filter">
+                @* <button type="submit">Go</button> *@
+                <input id="search-btn" type="button" class="btn btn-danger" onclick="javascript: setSearch(this)" value="Go" />
+            </form>
+        </div>
+    </div>
+    
+    @if(ViewBag.auth == 1){<a href="~/product/add">Add</a>}
+    @foreach (var i in Model.Items)
+    {
+        <div class="prod-list prod-list-table">
+            <div id="img-holder-@i.id" style="margin: auto">
+                <a href="product/detail/@i.id">
+                    <img src=@i.img_url class="img-grid">
+                </a>
             </div>
+            <div class="prod-desc">
+                <h4>Rp @i.price</h4>
+                <h5><a href="product/detail/@i.id">@i.name</a></h5>
+                <div id="desc-@i.id">@i.desc</div>
+                @if(ViewBag.auth == 1){
+                    <div id="rat-@i.id">Rating : @i.rating</div>
+                }
+            </div>
+            <div>
+                @{
+                    if(ViewBag.auth == 0)
+                    {
+                        <a href="~/cart/add/@i.id">
+                        <img src="~/cart.png" class="cart-btn">
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="~/product/edit/@i.id">
+                            <img src="~/edit.png" class="cart-btn">
+                        </a>
+                        <a href="~/product/delete/@i.id">
+                            <img src="~/delete.png" class="cart-btn">
+                        </a>
+                    }
+                }
+            </div>
+        </div>
+    }
+    @* pager *@
+    <div class="pagination-div">
+        <div name="page-list-count">
+            @if(Model.Pager.EndPage>1)
+            {
+                <ul class="pagination">
+                    @if(Model.Pager.CurrentPage>1)
+                    {
+                        <li>
+                            <a href="~/Product/Index?&perpage=@ViewBag.perPage&filter=@ViewBag.filter&order=@ViewBag.order">First</a>
+                        </li>
+                        <li>
+                            <a href="~/Product/Index?page=@(Model.Pager.CurrentPage-1)&perpage=@ViewBag.perPage&filter=@ViewBag.filter&order=@ViewBag.order">Previous</a>
+                        </li>
+                    }
+
+                    @for(var p=Model.Pager.StartPage; p<=Model.Pager.EndPage; p++)
+                    {
+                        <li class="@(p==Model.Pager.CurrentPage ? "active" :"")">
+                            <a href="~/Product/Index?page=@p&filter=@ViewBag.filter&order=@ViewBag.order&perpage=@ViewBag.perPage">@p</a>
+                        </li>
+                    }
+
+                    @if(Model.Pager.CurrentPage<Model.Pager.TotalPages)
+                    {
+                        <li>
+                            <a href="~/Product/Index?page=@(Model.Pager.CurrentPage + 1)&filter=@ViewBag.filter&order=@ViewBag.order&perpage=@ViewBag.perPage">Next</a>
+                        </li>
+                        <li>
+                            <a href="~/Product/Index?page=@(Model.Pager.TotalPages)&filter=@ViewBag.filter&order=@ViewBag.order&perpage=@ViewBag.perPage">Last</a>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+        <div name="per-page-set" style="margin: auto">
+            <input id="item-per-page" type="text" placeholder="..." name="filter" value="@ViewBag.perPage">
+            <input id="page-set-btn" type="button" class="btn btn-danger" onclick="javascript: setItemPerPage(this)" value="Set Page" />
+        </div>
+    </div>
+
+</div>
+
+
+<script type="text/javascript">
+    function setOrder(btn)
+    {
+        if(document.getElementById("order-sel").value != 0)
+        {
+            var filter = '@ViewBag.filter';
+            var perPage = '@ViewBag.perPage'
+            var orderVal = document.getElementById("order-sel").value;
+            var url = "https://localhost:5001/Product/Index?order=";
+            url += orderVal + "&filter=" + filter + "&perpage=" + perPage;
+            window.location.href = url;
         }
     }
-    @{var pager = ViewBag.pager;}
-    @if(pager.EndPage>1)
+
+    function setSearch(btn)
     {
-        <ul class="pagination">
-            @if(pager.CurrentPage>1)
-            {
-                <li>
-                    <a href="~/Home/Index">First</a>
-                </li>
-                <li>
-                    <a href="~/Home/Index?page=@(pager.CurrentPage-1)">Previous</a>
-                </li>
-            }
-
-            @for(var p=pager.StartPage; p<=pager.EndPage; p++)
-            {
-                <li class="@(p==pager.CurrentPage ? "active" :"")">
-                    <a href="~/Home/Index?page=@p">@p</a>
-                </li>
-            }
-
-            @if(pager.CurrentPage<pager.TotalPages)
-            {
-                <li>
-                    <a href="~/Home/Index?page=@(pager.CurrentPage + 1)">Next</a>
-                </li>
-                <li>
-                    <a href="~/Home/Index?page=@(pager.TotalPages)">Last</a>
-                </li>
-            }
-        </ul>
+        var order = '@ViewBag.order';
+        var perPage = '@ViewBag.perPage'
+        var filterVal = document.getElementById("searchFilter").value;
+        var url = "https://localhost:5001/Product/Index?filter=";
+        url += filterVal + "&order=" + order + "&perpage=" + perPage;
+        window.location.href = url;
     }
-</div>
+
+    function setLastOrderVal()
+    {
+        var selValue = '@ViewBag.order';
+        if(selValue != "")
+            document.getElementById("order-sel").value = selValue;
+    }
+
+    function setItemPerPage()
+    {
+        var order = '@ViewBag.order';
+        var filter = '@ViewBag.filter';
+        var perPage = document.getElementById("item-per-page").value;
+        url = "https://localhost:5001/Product/Index?perpage=";
+        url += perPage + "&filter=" + filter + "&order=" + order;
+        window.location.href = url;
+    }
+
+    window.onload = setLastOrderVal;
+    
+    var input = document.getElementById("searchFilter");
+    input.addEventListener("keyup", function(event) 
+    {
+        if (event.keyCode === 13) 
+        {
+            console.log("enter");
+            event.preventDefault();
+            document.getElementById("search-btn").click();
+        }
+    });
+</script>

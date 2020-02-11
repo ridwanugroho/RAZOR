@@ -22,23 +22,45 @@ namespace belajarRazor.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index(int ? page)
+        public IActionResult Index(int ? perpage, int? page, int ? order, string filter="")
         {
-            var items = from i in appDbContex.Barang where i.rating>5 select i;
+            var items1 = new List<Barang>();
+
+            if(!string.IsNullOrEmpty(filter) || !string.IsNullOrWhiteSpace(filter))
+            {
+                var products = from i in appDbContex.Barang where i.name.Contains(filter) || i.desc.Contains(filter) where i.rating>5 select i;
+                items1 = products.ToList();
+            }
+
+            else
+            {
+                var products = from i in appDbContex.Barang where i.rating>5 select i;
+                items1 = products.ToList();
+            }
+
+            if(order != null)
+            {
+                items1 = ProductController.orderBy(items1, order);
+            }
 
             ViewBag.auth = getAuth();
-			var pager = new Pager(items.Count(), page);
+            ViewBag.order = order;
+            ViewBag.filter = filter;
+            ViewBag.perPage = perpage;
+
+            int _perPage = 5;
+            if(perpage.HasValue)
+                _perPage = perpage.Value;
+
+			var pager = new Pager(items1.Count(), page, _perPage);
 			
 			var viewModel = new IndexViewModel
 			{
-				Items = items.Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize),
+				Items = items1.Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize),
 				Pager = pager
 			};
-
-            ViewBag.item = viewModel.Items;
-            ViewBag.pager = viewModel.Pager;
-
-            return View();
+			
+			return View(viewModel);
         }
 
         public IActionResult Privacy()

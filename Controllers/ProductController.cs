@@ -142,7 +142,7 @@ namespace belajarRazor.Controllers
             return RedirectToAction("Index", "Product");
         }
 
-        private List<Barang> orderBy(List<Barang> products, int ? order)
+        public static List<Barang> orderBy(List<Barang> products, int ? order)
         {
             switch (order)
             {
