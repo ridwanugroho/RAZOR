@@ -16,7 +16,7 @@
                     </a>
                 </div>
                 <div class="prod-desc">
-                    <h4>Rp @i.price</h4><br>
+                    <h4>Rp @i.price</h4>
                     <h5><a href="product/detail/@i.id">@i.name</a></h5>
                     @i.desc
                 </div>
@@ -27,5 +27,37 @@
                 </div>
             </div>
         }
+    }
+    @{var pager = ViewBag.pager;}
+    @if(pager.EndPage>1)
+    {
+        <ul class="pagination">
+            @if(pager.CurrentPage>1)
+            {
+                <li>
+                    <a href="~/Home/Index">First</a>
+                </li>
+                <li>
+                    <a href="~/Home/Index?page=@(pager.CurrentPage-1)">Previous</a>
+                </li>
+            }
+
+            @for(var p=pager.StartPage; p<=pager.EndPage; p++)
+            {
+                <li class="@(p==pager.CurrentPage ? "active" :"")">
+                    <a href="~/Home/Index?page=@p">@p</a>
+                </li>
+            }
+
+            @if(pager.CurrentPage<pager.TotalPages)
+            {
+                <li>
+                    <a href="~/Home/Index?page=@(pager.CurrentPage + 1)">Next</a>
+                </li>
+                <li>
+                    <a href="~/Home/Index?page=@(pager.TotalPages)">Last</a>
+                </li>
+            }
+        </ul>
     }
 </div>

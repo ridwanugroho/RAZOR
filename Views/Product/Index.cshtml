@@ -1,0 +1,155 @@
+@* {{{{{{{{{{{{{{{{{{{{{{{{{[{{{ data passing using model, not using ViewBag }}}]}}}}}}}}}}}}}}}}}}}}}}}}} *@
+
+@model belajarRazor.Models.IndexViewModel
+
+@{
+    ViewData["Title"] = "All Products";
+}
+
+<div class="">
+    <h2 class="text-center">All Products</h2>
+    <div class="order-opt">
+        <div>
+            <form>
+            <select id="order-sel" name="order-opt">
+                <option value="0">-Ordering type-</option>
+                <option value="1">Lower price</option>
+                <option value="2">Higher price</option>
+                <option value="3">Name ascending</option>
+                <option value="4">Name descending</option>
+                <option value="5">Lastest Created</option>
+                <option value="6">Older Created</option>
+                <option value="7">Lastest Updated</option>
+                <option value="8">Older Update</option>
+            </select>
+            @* <input type="submit" value="Submit"> *@
+            <input id="order-btn" type="button" class="btn btn-danger" onclick="javascript: setOrder(this)" value="Set" />
+        </form>
+        </div>
+        <div>
+            <form>
+                <input id="searchFilter" type="text" placeholder="search" name="filter" value="@ViewBag.filter">
+                @* <button type="submit">Go</button> *@
+                <input id="order-btn" type="button" class="btn btn-danger" onclick="javascript: search(this)" value="Go" />
+            </form>
+        </div>
+    </div>
+    
+    @if(ViewBag.auth == 1){<a href="~/product/add">Add</a>}
+    @foreach (var i in Model.Items)
+    {
+        <div class="prod-list prod-list-table">
+            <div id="img-holder-@i.id" style="margin: auto">
+                <a href="product/detail/@i.id">
+                    <img src=@i.img_url class="img-grid">
+                </a>
+            </div>
+            <div class="prod-desc">
+                <h4>Rp @i.price</h4>
+                <h5><a href="product/detail/@i.id">@i.name</a></h5>
+                <div id="desc-@i.id">@i.desc</div>
+                @if(ViewBag.auth == 1){
+                    <div id="rat-@i.id">Rating : @i.rating</div>
+                }
+            </div>
+            <div>
+                @{
+                    if(ViewBag.auth == 0)
+                    {
+                        <a href="~/cart/add/@i.id">
+                        <img src="~/cart.png" class="cart-btn">
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="~/product/edit/@i.id">
+                            <img src="~/edit.png" class="cart-btn">
+                        </a>
+                        <a href="~/product/delete/@i.id">
+                            <img src="~/delete.png" class="cart-btn">
+                        </a>
+                    }
+                }
+            </div>
+        </div>
+    }
+    @* pager *@
+    @if(Model.Pager.EndPage>1)
+    {
+        <ul class="pagination">
+            @if(Model.Pager.CurrentPage>1)
+            {
+                <li>
+                    <a href="~/Product/Index">First</a>
+                </li>
+                <li>
+                    <a href="~/Product/Index?page=@(Model.Pager.CurrentPage-1)">Previous</a>
+                </li>
+            }
+
+            @for(var p=Model.Pager.StartPage; p<=Model.Pager.EndPage; p++)
+            {
+                <li class="@(p==Model.Pager.CurrentPage ? "active" :"")">
+                    <a href="~/Product/Index?page=@p&filter=@ViewBag.filter&order=@ViewBag.order">@p</a>
+                </li>
+            }
+
+            @if(Model.Pager.CurrentPage<Model.Pager.TotalPages)
+            {
+                <li>
+                    <a href="~/Product/Index?page=@(Model.Pager.CurrentPage + 1)&filter=@ViewBag.filter&order=@ViewBag.order">Next</a>
+                </li>
+                <li>
+                    <a href="~/Product/Index?page=@(Model.Pager.TotalPages)&filter=@ViewBag.filter&order=@ViewBag.order">Last</a>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+
+<script type="text/javascript">
+    function setOrder(btn)
+    {
+        if(document.getElementById("order-sel").value != 0)
+        {
+            var filter = '@ViewBag.filter';
+            var orderVal = document.getElementById("order-sel").value;
+            var url = "https://localhost:5001/Product/Index?order=";
+            if(filter != "")
+                url += orderVal + "&filter=" + filter;
+            
+            else
+                url += orderVal;
+
+            console.log(url);
+            window.location.href = url;
+        }
+    }
+
+    function search(btn)
+    {
+        var order = '@ViewBag.order';
+        var filterVal = document.getElementById("searchFilter").value;
+        var url = "https://localhost:5001/Product/Index?filter=";
+        if(order != "")
+            url += filterVal + "&order=" + order;
+
+        else
+            url += filterVal;
+
+        console.log(url);
+        window.location.href = url;
+    }
+
+    function setLastOrderVal()
+    {
+        var selValue = '@ViewBag.order';
+        if(selValue != "")
+            document.getElementById("order-sel").value = selValue;
+    }
+
+
+    window.onload = setLastOrderVal;
+
+</script>

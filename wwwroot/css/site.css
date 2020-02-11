@@ -71,8 +71,8 @@ body {
 }
 
 .img-grid {
-  width: 200px;
-  height: 200px;
+  width: 100px;
+  height: 100px;
   display: block;
   margin: auto;
 }
@@ -86,11 +86,12 @@ body {
 
 .img-box {
   width: 300px;
-  height: 200px;
+  height: 150px;
 }
 
 .prod-list {
-  height: 250px;
+  height: auto;
+  min-height: 160px;
   border: cadetblue solid;
   border-width: 0.5px;
   margin: 5px;
@@ -99,6 +100,11 @@ body {
 .prod-list-table {
   display: grid;
   grid-template-columns: 1fr 3fr 0.15fr;
+}
+
+.order-opt {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
 }
 
 .cart-btn {

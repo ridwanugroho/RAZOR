@@ -22,13 +22,22 @@ namespace belajarRazor.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int ? page)
         {
-            var items = from i in appDbContex.Barang where i.rating>6 select i;
-            ViewBag.item = items;
+            var items = from i in appDbContex.Barang where i.rating>5 select i;
+
             ViewBag.auth = getAuth();
-            Console.WriteLine("auth status : {0}", getAuth());
-            
+			var pager = new Pager(items.Count(), page);
+			
+			var viewModel = new IndexViewModel
+			{
+				Items = items.Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize),
+				Pager = pager
+			};
+
+            ViewBag.item = viewModel.Items;
+            ViewBag.pager = viewModel.Pager;
+
             return View();
         }
 
