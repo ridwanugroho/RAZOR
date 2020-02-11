@@ -11,7 +11,7 @@
     <div class="order-opt">
         <div>
             <form>
-            <select id="order-sel" name="order-opt">
+            <select id="order-sel" name="order-opt" style="width: 200px; height: 30px">
                 <option value="0">-Ordering type-</option>
                 <option value="1">Lower price</option>
                 <option value="2">Higher price</option>
@@ -28,7 +28,7 @@
         </div>
         <div>
             <form>
-                <input id="searchFilter" type="text" placeholder="search" name="filter" value="@ViewBag.filter">
+                <input id="searchFilter" type="text" placeholder="search" name="filter" value="@ViewBag.filter" style="width: 200px; height: 30px">
                 @* <button type="submit">Go</button> *@
                 <input id="search-btn" type="button" class="btn btn-danger" onclick="javascript: setSearch(this)" value="Go" />
             </form>
@@ -109,7 +109,7 @@
             }
         </div>
         <div name="per-page-set" style="margin: auto">
-            <input id="item-per-page" type="text" placeholder="..." name="filter" value="@ViewBag.perPage">
+            <input id="item-per-page" type="text" placeholder="..." name="filter" value="@ViewBag.perPage" style="width: 50px; height: 30px">
             <input id="page-set-btn" type="button" class="btn btn-danger" onclick="javascript: setItemPerPage(this)" value="Set Page" />
         </div>
     </div>
