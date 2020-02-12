@@ -1,0 +1,19 @@
+@{
+    var item = ViewBag.item;
+}
+
+<form asp-action="Update" asp-controller="Product" method="post">
+    <label>Nama barang </label>
+    <input type="text" name="name" value="@item.name"/><br>
+    <label>Deskripsi </label>
+    <input type="text" name="desc" value="@item.desc"/><br>
+    <label>Harga </label>
+    <input type="text" name="price" value="@item.price"/><br>
+    <label>Gambar </label>
+    <input type="text" name="img_url" value="@item.img_url"/><br>
+    <label>Rating </label>
+    <input type="text" name="rating" value="@item.rating"/><br>
+    <input type="text" name="id" value="@item.id" hidden/>
+
+    <input type="submit" class="submit" value="Update" />
+</form>

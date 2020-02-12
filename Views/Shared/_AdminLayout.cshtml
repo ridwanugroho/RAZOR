@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -22,9 +22,6 @@
                             
                             <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index">Product</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index">Cart</a>
-                        </li>
                     </ul>
                 </div>
                 <div class="dropdown">
@@ -33,6 +30,7 @@
                         @if(ViewBag.auth == 0){<a href="https://localhost:5001/user">Login</a>}
                         @if(ViewBag.auth == 1){
                             <a href="https://localhost:5001/user/logout">Logout</a>
+                            <a href="#">Edit product</a>
                         }
                     </div>
                 </div>

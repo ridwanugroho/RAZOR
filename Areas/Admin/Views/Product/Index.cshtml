@@ -34,7 +34,10 @@
             </form>
         </div>
     </div>
-
+    <a href="~/product/add">Add</a>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+        Launch ADD modal
+    </button>
     @foreach (var i in Model.Items)
     {
         <div class="prod-list prod-list-table">
@@ -47,10 +50,14 @@
                 <h4>Rp @i.price</h4>
                 <h5><a href="product/detail/@i.id">@i.name</a></h5>
                 <div id="desc-@i.id">@i.desc</div>
+                <div id="rat-@i.id">Rating : @i.rating</div>
             </div>
             <div>
-                <a href="~/cart/add/@i.id">
-                <img src="~/cart.png" class="cart-btn">
+                <a href="~/product/edit/@i.id">
+                    <img src="~/edit.png" class="cart-btn">
+                </a>
+                <a href="~/product/delete/@i.id">
+                    <img src="~/delete.png" class="cart-btn">
                 </a>
             </div>
         </div>
@@ -94,6 +101,67 @@
             <input id="item-per-page" type="text" placeholder="..." name="filter" value="@ViewBag.perPage" style="width: 50px; height: 30px">
             <input id="page-set-btn" type="button" class="btn btn-danger" onclick="javascript: setItemPerPage(this)" value="Set Page" />
         </div>
+    </div>
+
+    <div class="modal fade" id="exampleModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Add/Edit Products</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form>
+            <div class="form-group">
+                <label for="recipient-name" class="col-form-label">Recipient:</label>
+                <input type="text" class="form-control" id="recipient-name">
+            </div>
+            <div class="form-group">
+                <label for="message-text" class="col-form-label">Message:</label>
+                <textarea class="form-control" id="message-text"></textarea>
+            </div>
+            </form>
+    
+            @using (Html.BeginForm("AddProduct", "Product", FormMethod.Post))
+            {
+                <table>
+                    <tr>
+                        <td>Nama produk: </td>
+                        <td>@Html.TextBox("name")</td>
+                    </tr>
+                    <tr>
+                        <td>Deskripsi: </td>
+                        <td>@Html.TextBox("desc")</td>
+                    </tr>
+                    <tr>
+                        <tr>
+                        <td>Gambar: </td>
+                        <td>@Html.TextBox("img_url")</td>
+                    </tr>
+                    <tr>
+                        <td>Harga: </td>
+                        <td>@Html.TextBox("price")</td>
+                    </tr>
+                    <tr>
+                        <td>Rating: </td>
+                        <td>@Html.TextBox("rating")</td>
+                    </tr>
+                    <tr>
+                    <tr>
+                    <tr>
+                        <td colspan="2"><input type="submit" value="Submit"></td>
+                    </tr>
+                </table>
+            }
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Understood</button>
+        </div>
+        </div>
+    </div>
     </div>
 </div>
 

@@ -52,55 +52,15 @@ namespace belajarRazor.Migrations
                     b.ToTable("Barang");
                 });
 
-            modelBuilder.Entity("belajarRazor.Models.Cart", b =>
+            modelBuilder.Entity("belajarRazor.Models.Carts", b =>
                 {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("Userid")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("createdAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("editedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<double>("totalPrice")
                         .HasColumnType("float");
 
-                    b.HasKey("id");
-
-                    b.HasIndex("Userid");
-
-                    b.ToTable("Cart");
-                });
-
-            modelBuilder.Entity("belajarRazor.Models.Item", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("Barangid")
+                    b.Property<int>("userID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("cartid")
-                        .HasColumnType("int");
-
-                    b.Property<int>("qty")
-                        .HasColumnType("int");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("Barangid");
-
-                    b.HasIndex("cartid");
-
-                    b.ToTable("Items");
+                    b.ToTable("Carts");
                 });
 
             modelBuilder.Entity("belajarRazor.Models.User", b =>
@@ -131,24 +91,6 @@ namespace belajarRazor.Migrations
                     b.HasKey("id");
 
                     b.ToTable("User");
-                });
-
-            modelBuilder.Entity("belajarRazor.Models.Cart", b =>
-                {
-                    b.HasOne("belajarRazor.Models.User", "User")
-                        .WithMany("Carts")
-                        .HasForeignKey("Userid");
-                });
-
-            modelBuilder.Entity("belajarRazor.Models.Item", b =>
-                {
-                    b.HasOne("belajarRazor.Models.Barang", "Barang")
-                        .WithMany()
-                        .HasForeignKey("Barangid");
-
-                    b.HasOne("belajarRazor.Models.Cart", "cart")
-                        .WithMany("Items")
-                        .HasForeignKey("cartid");
                 });
 #pragma warning restore 612, 618
         }

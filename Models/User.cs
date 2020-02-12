@@ -12,6 +12,6 @@ namespace belajarRazor.Models
         public int authLevel{get; set;}
         public DateTime createdAt{get; set;}
         public DateTime updatedAt{get; set;}
-        public ICollection<Cart> Carts{get; set;}
+        // public List<Carts> Carts{get; set;}
     }
 }

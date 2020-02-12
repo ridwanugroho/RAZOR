@@ -65,7 +65,7 @@ namespace belajarRazor.Controllers
 
         public IActionResult Privacy()
         {
-            return View();
+            return Redirect("~/Admin/Product");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

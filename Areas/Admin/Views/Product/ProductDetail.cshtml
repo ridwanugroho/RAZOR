@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Product detail";
+    ViewBag.Title = "Product";
+}
+
+<div>
+    @{
+        var item = ViewBag.item;
+    }
+    <div class="prod-list-table">
+        <div class="">
+            <img src=@item.img_url class="img-grid-detail">
+        </div>
+        <div class="">
+            <h4>@item.name</h4>
+            <h5>Rp @item.price</h5>
+            <h5>@item.desc</h5>
+            <a class="btn btn-primary" href="https://localhost:5001/cart/add/@item.id">Add To Cart</a>
+        </div>
+    </div>
+</div>

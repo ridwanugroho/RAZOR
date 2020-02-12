@@ -25,98 +25,103 @@ namespace belajarRazor.Controllers
 
         public IActionResult Index()
         {
-            if(appDbContex.Cart.Any())
-            {
-                var items = from item in appDbContex.Items.Include(b=>b.Barang) select item;
-                var  itemList = generateItemToLoad(items.ToList());
-                var totalPrice = calculateTotal(itemList);
-                ViewBag.Items = itemList;
-                ViewBag.totalPrice = totalPrice;
-                ViewBag.auth = getAuth();
-            }
+            int ? userId = HttpContext.Session.GetInt32("id");
+            
+            // var  itemList = generateItemToLoad(carts.First().Items.ToList());
+            // var totalPrice = calculateTotal(itemList);
+            // ViewBag.Items = itemList;
+            // ViewBag.totalPrice = totalPrice;
+            // ViewBag.auth = getAuth();
 
             return View("AllCarts");
         }
 
         public IActionResult Add(int id)
         {
-            var barang = appDbContex.Barang.Find(id);
-            var item = new Item()
-            {
-                Barang = barang,
-                qty = 1
-            };
+            if(getAuth() == 0)
+                return Ok("Anda harus login!");
 
-            if(!appDbContex.Cart.Any())
-            {
-                var cart = new Cart()
-                {
-                    Items = new List<Item>(){item},
-                    totalPrice = barang.price
-                };
+            // int ? userId = HttpContext.Session.GetInt32("id");
+            // var user = appDbContex.User.Find(userId);
+            // var barang = appDbContex.Barang.Find(id);
+            // var item = new Item()
+            // {
+            //     Barang = barang,
+            //     qty = 1
+            // };
 
-                appDbContex.Cart.Add(cart);
-                appDbContex.SaveChanges();
-            }
 
-            else
-            {
-                if(appDbContex.Items.Any(i=>i.Barang == barang))
-                    return View("CartConfirmNo");
+            // if(!appDbContex.Cart.Any())
+            // {
+            //     var cart = new Cart()
+            //     {
+            //         Items = new List<Item>(){item},
+            //         totalPrice = barang.price
+            //     };
 
-                var cart = appDbContex.Cart.Find(1);
-                cart.Items = new List<Item>(){item};
-                appDbContex.SaveChanges();
-            }
+            //     appDbContex.Cart.Add(cart);
+            //     appDbContex.SaveChanges();
+            // }
+
+            // else
+            // {
+            //     if(appDbContex.Items.Any(i=>i.Barang == barang))
+            //         return View("CartConfirmNo");
+
+            //     var cart = appDbContex.Cart.Find(1);
+            //     cart.Items = new List<Item>(){item};
+            //     cart.editedAt = DateTime.Now;
+            //     appDbContex.SaveChanges();
+            // }
 
             
             return View("CartConfirmYes");
         }
 
-        public IActionResult update(int id, int val)
-        {
-            Console.WriteLine(id);
-            Console.WriteLine(val);
-            var item = appDbContex.Items.Find(id);
-            item.qty = val;
-            appDbContex.SaveChanges();
+        // public IActionResult update(int id, int val)
+        // {
+        //     Console.WriteLine(id);
+        //     Console.WriteLine(val);
+        //     var item = appDbContex.Items.Find(id);
+        //     item.quantity = val;
+        //     appDbContex.SaveChanges();
 
-            return RedirectToAction("Index", "Cart");
-        }
+        //     return RedirectToAction("Index", "Cart");
+        // }
 
         public IActionResult Remove(int id)
         {
-            var itemToRemove = appDbContex.Items.Find(id);
-            appDbContex.Items.Remove(itemToRemove);
-            appDbContex.SaveChanges();
+            // var itemToRemove = appDbContex.Items.Find(id);
+            // appDbContex.Items.Remove(itemToRemove);
+            // appDbContex.SaveChanges();
 
             return RedirectToAction("Index", "Cart");
         }
 
-        private List<CartItemToView> generateItemToLoad(List<Item> items)
-        {   
-            var cartList = new List<CartItemToView>();
+        // private List<CartItemToView> generateItemToLoad(List<Item> items)
+        // {   
+        //     var cartList = new List<CartItemToView>();
 
-            foreach (var item in items)
-            {
-                cartList.Add(new CartItemToView()
-                            {
-                                id= item.id,
-                                name = item.Barang.name,
-                                qty = item.qty,
-                                itemPrice = item.Barang.price,
-                                totItemPrice = item.Barang.price * item.qty,
-                                img_url = item.Barang.img_url
-                            });
-            }
+        //     foreach (var item in items)
+        //     {
+        //         cartList.Add(new CartItemToView()
+        //                     {
+        //                         id= item.id,
+        //                         name = item.Barang.name,
+        //                         qty = item.qty,
+        //                         itemPrice = item.Barang.price,
+        //                         totItemPrice = item.Barang.price * item.qty,
+        //                         img_url = item.Barang.img_url
+        //                     });
+        //     }
             
-            return cartList;
-        }
+        //     return cartList;
+        // }
 
         private double calculateTotal(List<CartItemToView> items)
         {
             var totalPrice = items.Select(t => t.totItemPrice).Sum();
-            var cart = appDbContex.Cart.Find(1);
+            var cart = appDbContex.Carts.Find(1);
             cart.totalPrice = totalPrice;
             appDbContex.SaveChanges();
 

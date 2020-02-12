@@ -37,13 +37,6 @@ namespace belajarRazor.Controllers
             return View("Login");
         }
 
-        [Authorize]
-        [HttpGet]
-        public IActionResult GetUser()
-        {
-            return Ok(getUser());
-        }
-
         [HttpPost("register")]
         public IActionResult RegisterUser([FromBody] User user)
         {
@@ -61,24 +54,6 @@ namespace belajarRazor.Controllers
             appDbContex.SaveChanges();
 
             return Ok(user);
-        }
-
-        [HttpGet("info/alluser")]
-        public IActionResult UserInfo()
-        {
-            return null;
-        }
-
-        private User getUser()
-        {
-            var token = System.IO.File.ReadAllText("token.txt");
-            var jwtSecrTokenHandler = new JwtSecurityTokenHandler();
-            var secrToken = jwtSecrTokenHandler.ReadToken(token) as JwtSecurityToken;
-
-            var userId = secrToken?.Claims.First(claim => claim.Type == "sub").Value;
-            var user= from usr in appDbContex.User where usr.id == Convert.ToInt32(userId) select usr;
-            
-            return user.First();
         }
 
         /////////////////////////////// LOGIN LOGOUT  //////////////////////////////
@@ -104,12 +79,16 @@ namespace belajarRazor.Controllers
             }
 
             var token = generateJwtToken(user);
-            var fToken = new StreamWriter("token.txt");
-            fToken.Write(token);
-            fToken.Close();
-            HttpContext.Session.SetString("JWToken", token);
 
-            return RedirectToAction("Index", "Product");
+            HttpContext.Session.SetString("JWToken", token);
+            HttpContext.Session.SetInt32("id", user.id);
+
+            if(user.authLevel == 1)
+                return Redirect("~/Admin/Product");
+            
+            else
+                return RedirectToAction("Index", "Product");
+
         }
 
         [Authorize]
@@ -158,6 +137,5 @@ namespace belajarRazor.Controllers
 
             return encodedToken;
         }
-    
     }
 }
