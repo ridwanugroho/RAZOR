@@ -34,29 +34,27 @@
             </form>
         </div>
     </div>
-    <a href="~/product/add">Add</a>
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-        Launch ADD modal
-    </button>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editorModal">Add</button>
     @foreach (var i in Model.Items)
     {
         <div class="prod-list prod-list-table">
             <div id="img-holder-@i.id" style="margin: auto">
-                <a href="product/detail/@i.id">
-                    <img src=@i.img_url class="img-grid">
+                <a href="/admin/product/detail/@i.id">
+                    <img id="img-@i.id" src=@i.img_url class="img-grid">
                 </a>
             </div>
             <div class="prod-desc">
-                <h4>Rp @i.price</h4>
-                <h5><a href="product/detail/@i.id">@i.name</a></h5>
-                <div id="desc-@i.id">@i.desc</div>
+                <h4 id="prc-@i.id">Rp @i.price</h4>
+                <h5><a id="name-@i.id" href="/admin/product/detail/@i.id">@i.name</a></h5>
+                <div id="desc-@i.id">@i.description</div>
                 <div id="rat-@i.id">Rating : @i.rating</div>
             </div>
             <div>
-                <a href="~/product/edit/@i.id">
+                @* <a href="~/admin/product/edit/@i.id"> *@
+                <a id="btn-@i.id" onclick="javascript: setEdit(this)">
                     <img src="~/edit.png" class="cart-btn">
                 </a>
-                <a href="~/product/delete/@i.id">
+                <a href="~/admin/product/delete/@i.id">
                     <img src="~/delete.png" class="cart-btn">
                 </a>
             </div>
@@ -71,27 +69,27 @@
                     @if(Model.Pager.CurrentPage>1)
                     {
                         <li>
-                            <a href="~/Product/Index?&perpage=@ViewBag.perPage&filter=@ViewBag.filter&order=@ViewBag.order">First</a>
+                            <a href="~/admin/Product/Index?&perpage=@ViewBag.perPage&filter=@ViewBag.filter&order=@ViewBag.order">First</a>
                         </li>
                         <li>
-                            <a href="~/Product/Index?page=@(Model.Pager.CurrentPage-1)&perpage=@ViewBag.perPage&filter=@ViewBag.filter&order=@ViewBag.order">Previous</a>
+                            <a href="~/admin/Product/Index?page=@(Model.Pager.CurrentPage-1)&perpage=@ViewBag.perPage&filter=@ViewBag.filter&order=@ViewBag.order">Previous</a>
                         </li>
                     }
 
                     @for(var p=Model.Pager.StartPage; p<=Model.Pager.EndPage; p++)
                     {
                         <li class="@(p==Model.Pager.CurrentPage ? "active" :"")">
-                            <a href="~/Product/Index?page=@p&filter=@ViewBag.filter&order=@ViewBag.order&perpage=@ViewBag.perPage">@p</a>
+                            <a href="~/admin/Product/Index?page=@p&filter=@ViewBag.filter&order=@ViewBag.order&perpage=@ViewBag.perPage">@p</a>
                         </li>
                     }
 
                     @if(Model.Pager.CurrentPage<Model.Pager.TotalPages)
                     {
                         <li>
-                            <a href="~/Product/Index?page=@(Model.Pager.CurrentPage + 1)&filter=@ViewBag.filter&order=@ViewBag.order&perpage=@ViewBag.perPage">Next</a>
+                            <a href="~/admin/Product/Index?page=@(Model.Pager.CurrentPage + 1)&filter=@ViewBag.filter&order=@ViewBag.order&perpage=@ViewBag.perPage">Next</a>
                         </li>
                         <li>
-                            <a href="~/Product/Index?page=@(Model.Pager.TotalPages)&filter=@ViewBag.filter&order=@ViewBag.order&perpage=@ViewBag.perPage">Last</a>
+                            <a href="~/admin/Product/Index?page=@(Model.Pager.TotalPages)&filter=@ViewBag.filter&order=@ViewBag.order&perpage=@ViewBag.perPage">Last</a>
                         </li>
                     }
                 </ul>
@@ -103,66 +101,44 @@
         </div>
     </div>
 
-    <div class="modal fade" id="exampleModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel">Add/Edit Products</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form>
-            <div class="form-group">
-                <label for="recipient-name" class="col-form-label">Recipient:</label>
-                <input type="text" class="form-control" id="recipient-name">
+    <div class="modal fade" id="editorModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Add/Edit Products</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @* <form id="modal-form" asp-action="AddProduct" asp-controller="Product" method="post"> *@
+                    <form id="modal-form" action="https://localhost:5001/admin/product/AddProduct" method="post">
+                        <label for="modal-name">Nama Barang</label>
+                        <input id="modal-name" type="text" name="name" placeholder="name" class="form-control">
+                        <label for="modal-desc">Deskripsi barang</label>
+                        <input id="modal-desc" type="text" name="description" placeholder="description" class="form-control">
+                        <label for="modal-url">Gambar(url)</label>
+                        <input id="modal-url" type="text" name="img_url" placeholder="img_url" class="form-control">
+                        <label for="modal-prc">Harga</label>
+                        <input id="modal-prc" type="text" name="price" placeholder="price" class="form-control">
+                        <label for="modal-rat">Rating barang</label>
+                        <input id="modal-rat" type="text" name="rating" placeholder="rating" class="form-control"><br>
+                        <input id="modal-id" type="text" name="id" value="0" hidden>
+                        <div class="d-flex justify-content-center">
+                            <input id="modal-snd-btn" type="submit" value="Buat iklan" class="btn btn-primary">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="message-text" class="col-form-label">Message:</label>
-                <textarea class="form-control" id="message-text"></textarea>
-            </div>
-            </form>
-    
-            @using (Html.BeginForm("AddProduct", "Product", FormMethod.Post))
-            {
-                <table>
-                    <tr>
-                        <td>Nama produk: </td>
-                        <td>@Html.TextBox("name")</td>
-                    </tr>
-                    <tr>
-                        <td>Deskripsi: </td>
-                        <td>@Html.TextBox("desc")</td>
-                    </tr>
-                    <tr>
-                        <tr>
-                        <td>Gambar: </td>
-                        <td>@Html.TextBox("img_url")</td>
-                    </tr>
-                    <tr>
-                        <td>Harga: </td>
-                        <td>@Html.TextBox("price")</td>
-                    </tr>
-                    <tr>
-                        <td>Rating: </td>
-                        <td>@Html.TextBox("rating")</td>
-                    </tr>
-                    <tr>
-                    <tr>
-                    <tr>
-                        <td colspan="2"><input type="submit" value="Submit"></td>
-                    </tr>
-                </table>
-            }
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Understood</button>
-        </div>
         </div>
     </div>
-    </div>
+    <form asp-action="ProccessUpload" asp-controller="Product" method="post" enctype="multipart/form-data">
+        <input type="file" name="files" value="files">
+        <input type="submit" value="Upload">
+    </form>
 </div>
 
 
@@ -172,9 +148,9 @@
         if(document.getElementById("order-sel").value != 0)
         {
             var filter = '@ViewBag.filter';
-            var perPage = '@ViewBag.perPage'
+            var perPage = '@ViewBag.perPage';
             var orderVal = document.getElementById("order-sel").value;
-            var url = "https://localhost:5001/Product/Index?order=";
+            var url = "https://localhost:5001/admin/Product/Index?order=";
             url += orderVal + "&filter=" + filter + "&perpage=" + perPage;
             window.location.href = url;
         }
@@ -183,9 +159,9 @@
     function setSearch(btn)
     {
         var order = '@ViewBag.order';
-        var perPage = '@ViewBag.perPage'
+        var perPage = '@ViewBag.perPage';
         var filterVal = document.getElementById("searchFilter").value;
-        var url = "https://localhost:5001/Product/Index?filter=";
+        var url = "https://localhost:5001/admin/Product/Index?filter=";
         url += filterVal + "&order=" + order + "&perpage=" + perPage;
         window.location.href = url;
     }
@@ -202,7 +178,7 @@
         var order = '@ViewBag.order';
         var filter = '@ViewBag.filter';
         var perPage = document.getElementById("item-per-page").value;
-        url = "https://localhost:5001/Product/Index?perpage=";
+        url = "https://localhost:5001/admin/Product/Index?perpage=";
         url += perPage + "&filter=" + filter + "&order=" + order;
         window.location.href = url;
     }
@@ -219,4 +195,30 @@
             document.getElementById("search-btn").click();
         }
     });
+
+    function setEdit(btn)
+    {
+        var id = btn.id;
+        id = id.substring(4, id.length);
+        var name = document.getElementById("name-"+id).innerHTML;
+        var description = document.getElementById("desc-"+id).innerHTML;
+        var price = document.getElementById("prc-"+id).innerHTML;
+        var rating = document.getElementById("rat-"+id).innerHTML;
+        var img_src = document.getElementById("img-"+id).src;
+
+        price = price.substring(3, price.length);
+        rating = rating.substring(9, rating.length);
+
+        document.getElementById("modal-id").value = id;
+        document.getElementById("modal-name").value = name;
+        document.getElementById("modal-desc").value = description;
+        document.getElementById("modal-url").value = img_src;
+        document.getElementById("modal-prc").value = price;
+        document.getElementById("modal-rat").value = rating;
+        document.getElementById('modal-snd-btn').value = "Edit";
+        document.getElementById("modal-form").action = "https://localhost:5001/Admin/product/update";
+
+        $("#editorModal").modal();
+
+    }
 </script>

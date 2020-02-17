@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using belajarRazor.Data;
 
 namespace belajarRazor.Migrations
 {
     [DbContext(typeof(AppDbContex))]
-    partial class AppDbContexModelSnapshot : ModelSnapshot
+    [Migration("20200217022040_add-gopay-detail-action-transaction")]
+    partial class addgopaydetailactiontransaction
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,52 +75,12 @@ namespace belajarRazor.Migrations
                     b.ToTable("Carts");
                 });
 
-            modelBuilder.Entity("belajarRazor.Models.Purchases", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PaymentMethod")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("TransactionsDetailid")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Userid")
-                        .HasColumnType("int");
-
-                    b.Property<string>("_ItemsDetail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("courir")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TransactionsDetailid");
-
-                    b.HasIndex("Userid");
-
-                    b.ToTable("Purchases");
-                });
-
             modelBuilder.Entity("belajarRazor.Models.TransactionDetails", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("_actions")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("_va_numbers")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("currency")
                         .HasColumnType("nvarchar(max)");
@@ -188,15 +150,34 @@ namespace belajarRazor.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("belajarRazor.Models.Purchases", b =>
+            modelBuilder.Entity("belajarRazor.Models.Virtual", b =>
                 {
-                    b.HasOne("belajarRazor.Models.TransactionDetails", "TransactionsDetail")
-                        .WithMany()
-                        .HasForeignKey("TransactionsDetailid");
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.HasOne("belajarRazor.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("Userid");
+                    b.Property<int?>("TransactionDetailsid")
+                        .HasColumnType("int");
+
+                    b.Property<string>("bank")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("va_number")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("TransactionDetailsid");
+
+                    b.ToTable("VaNumber");
+                });
+
+            modelBuilder.Entity("belajarRazor.Models.Virtual", b =>
+                {
+                    b.HasOne("belajarRazor.Models.TransactionDetails", null)
+                        .WithMany("va_numbers")
+                        .HasForeignKey("TransactionDetailsid");
                 });
 #pragma warning restore 612, 618
         }

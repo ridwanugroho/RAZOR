@@ -10,8 +10,8 @@ using belajarRazor.Data;
 namespace belajarRazor.Migrations
 {
     [DbContext(typeof(AppDbContex))]
-    [Migration("20200212094017_init-database-toko")]
-    partial class initdatabasetoko
+    [Migration("20200213070256_change-single-item-to-list-items")]
+    partial class changesingleitemtolistitems
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -31,7 +31,7 @@ namespace belajarRazor.Migrations
                     b.Property<DateTime>("createdAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("desc")
+                    b.Property<string>("description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("editedAt")
@@ -56,11 +56,21 @@ namespace belajarRazor.Migrations
 
             modelBuilder.Entity("belajarRazor.Models.Carts", b =>
                 {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("_Items")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<double>("totalPrice")
                         .HasColumnType("float");
 
                     b.Property<int>("userID")
                         .HasColumnType("int");
+
+                    b.HasKey("id");
 
                     b.ToTable("Carts");
                 });

@@ -1,0 +1,43 @@
+@model List<belajarRazor.Models.Purchases>
+
+@{
+    ViewData["Title"] = "Transaksi";
+}
+<h1>@ViewData["Title"]</h1>
+
+
+<div class="">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">No</th>
+                <th scope="col">Nama Transaksi</th>
+                <th scope="col">ID transaksi</th>
+                <th scope="col">Total bayar</th>
+                <th scope="col">Jenis pembayaran</th>
+                <th scope="col">Tujuan pebayaran</th>
+                <th scope="col">Status pebayaran</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{int i = 1;}
+            @foreach (var trans in Model)
+            {
+                <tr>
+                    <th scope="row">@i</th>
+                    <td>@trans.ItemsDetail.Items.First().Item.name</td>
+                    <td>@trans.TransactionsDetail.order_id</td>
+                    <td>@trans.TransactionsDetail.gross_amount</td>
+                    <td>@trans.PaymentMethod</td>
+                    <td>@trans.TransactionsDetail.va_numbers.First().va_number</td>
+                    <td>@trans.TransactionsDetail.transaction_status</td>
+                </tr>
+
+                i++;
+            }
+        </tbody>
+    </table>
+    <div class="right-2-div">
+        <div><a name="trans-refresh" type="action" class="btn btn-primary" href="~/purchase/TransactionDetail")>Refresh</a></div>
+    </div>  
+</div>

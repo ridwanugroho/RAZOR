@@ -28,7 +28,7 @@ namespace belajarRazor.Controllers
 
             if(!string.IsNullOrEmpty(filter) || !string.IsNullOrWhiteSpace(filter))
             {
-                var products = from i in appDbContex.Barang where i.name.Contains(filter) || i.desc.Contains(filter) where i.rating>5 select i;
+                var products = from i in appDbContex.Barang where i.name.Contains(filter) || i.description.Contains(filter) where i.rating>5 select i;
                 items1 = products.ToList();
             }
 

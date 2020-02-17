@@ -35,7 +35,6 @@
         </div>
     </div>
     
-    @if(ViewBag.auth == 1){<a href="~/product/add">Add</a>}
     @foreach (var i in Model.Items)
     {
         <div class="prod-list prod-list-table">
@@ -47,29 +46,12 @@
             <div class="prod-desc">
                 <h4>Rp @i.price</h4>
                 <h5><a href="product/detail/@i.id">@i.name</a></h5>
-                <div id="desc-@i.id">@i.desc</div>
-                @if(ViewBag.auth == 1){
-                    <div id="rat-@i.id">Rating : @i.rating</div>
-                }
+                <div id="desc-@i.id">@i.description</div>
             </div>
             <div>
-                @{
-                    if(ViewBag.auth == 0)
-                    {
-                        <a href="~/cart/add/@i.id">
-                        <img src="~/cart.png" class="cart-btn">
-                        </a>
-                    }
-                    else
-                    {
-                        <a href="~/product/edit/@i.id">
-                            <img src="~/edit.png" class="cart-btn">
-                        </a>
-                        <a href="~/product/delete/@i.id">
-                            <img src="~/delete.png" class="cart-btn">
-                        </a>
-                    }
-                }
+                <a href="~/cart/add/@i.id">
+                <img src="~/cart.png" class="cart-btn">
+                </a>
             </div>
         </div>
     }

@@ -30,7 +30,7 @@ namespace belajarRazor.Controllers
 
             if(!string.IsNullOrEmpty(filter) || !string.IsNullOrWhiteSpace(filter))
             {
-                var products = from i in appDbContex.Barang where i.name.Contains(filter) || i.desc.Contains(filter) select i;
+                var products = from i in appDbContex.Barang where i.name.Contains(filter) || i.description.Contains(filter) select i;
                 items1 = products.ToList();
             }
 
@@ -75,72 +75,6 @@ namespace belajarRazor.Controllers
 
             return View("ProductDetail");
         }  
-
-        [Authorize]
-        public IActionResult Add()
-        {
-            ViewBag.auth = getAuth();
-            return View();
-        }
-
-        [Authorize]
-        public IActionResult AddProduct(IFormCollection _product)
-        {
-            var product = new Barang()
-            {
-                name = _product["name"],
-                desc = _product["desc"],
-                img_url = _product["img_url"],
-                price = Convert.ToDouble(_product["price"]),
-                rating = Convert.ToInt32(_product["rating"]),
-                createdAt = DateTime.Now,
-                editedAt = DateTime.Now
-            };
-
-            appDbContex.Barang.Add(product);
-            appDbContex.SaveChanges();
-
-            return RedirectToAction("Index", "Product");
-        }
-
-        [Authorize]
-        public IActionResult Edit(int id)
-        {
-            var product = appDbContex.Barang.Find(id);
-            ViewBag.item = product;
-
-
-            return View();
-        }
-
-        [Authorize]
-        public IActionResult Update(Barang _product)
-        {
-            string[] varList = {"name", "desc", "price", "rating", "img_url"};
-
-            var productToUpdate = appDbContex.Barang.Find(_product.id);
-            foreach (var item in varList)
-            {
-                var prop = typeof(Barang).GetProperty(item);
-                prop.SetValue(productToUpdate, prop.GetValue(_product, null));
-            }
-
-            productToUpdate.editedAt = DateTime.Now;
-
-            appDbContex.SaveChanges();
-
-            return RedirectToAction("Index", "Product");
-        }
-
-        [Authorize]
-        public IActionResult Delete(int id)
-        {
-            var productToDel = appDbContex.Barang.Find(id);
-            appDbContex.Barang.Remove(productToDel);
-            appDbContex.SaveChanges();
-
-            return RedirectToAction("Index", "Product");
-        }
 
         public static List<Barang> orderBy(List<Barang> products, int ? order)
         {

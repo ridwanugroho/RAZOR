@@ -1,4 +1,6 @@
 using System;
+using System.Reflection;
+using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -25,14 +27,14 @@ namespace belajarRazor.Areas.Admin.Controllers
             this.appDbContex = appDbContex;
         }
 
-        [Authorize]
+        // [Authorize]
         public IActionResult Index(int ? perpage, int? page, int ? order, string filter="")
         {
             var items1 = new List<Barang>();
 
             if(!string.IsNullOrEmpty(filter) || !string.IsNullOrWhiteSpace(filter))
             {
-                var products = from i in appDbContex.Barang where i.name.Contains(filter) || i.desc.Contains(filter) select i;
+                var products = from i in appDbContex.Barang where i.name.Contains(filter) || i.description.Contains(filter) select i;
                 items1 = products.ToList();
             }
 
@@ -79,6 +81,44 @@ namespace belajarRazor.Areas.Admin.Controllers
         }  
 
         [Authorize]
+        public IActionResult ProccessUpload([FromForm(Name="files")] IFormFile files)
+        {
+            Console.WriteLine(files.FileName);
+            try
+            {
+                var streamer = new StreamReader(files.OpenReadStream());
+                var str = streamer.ReadToEnd();
+                var strLines = str.Split('\n');
+                
+                foreach (var line in strLines.Take(strLines.Count()-1))
+                {
+                    Console.WriteLine(line);
+                    var singleData = line.Split(',');
+
+                    var toAdd = new Barang()
+                    {
+                        name = singleData[0],
+                        description = singleData[1],
+                        img_url = singleData[2],
+                        price = Convert.ToDouble(singleData[3]),
+                        rating = Convert.ToInt32(singleData[4])
+                    };
+
+                    appDbContex.Barang.Add(toAdd);
+                }
+
+                appDbContex.SaveChanges();
+
+                return RedirectToAction("Index", "Product");
+            }
+            catch (System.Exception e)
+            {
+                
+                return Ok("format salah\n\n" + e);
+            }
+        }
+
+        [Authorize]
         public IActionResult Add()
         {
             ViewBag.auth = getAuth();
@@ -91,7 +131,7 @@ namespace belajarRazor.Areas.Admin.Controllers
             var product = new Barang()
             {
                 name = _product["name"],
-                desc = _product["desc"],
+                description = _product["description"],
                 img_url = _product["img_url"],
                 price = Convert.ToDouble(_product["price"]),
                 rating = Convert.ToInt32(_product["rating"]),
@@ -118,13 +158,16 @@ namespace belajarRazor.Areas.Admin.Controllers
         [Authorize]
         public IActionResult Update(Barang _product)
         {
-            string[] varList = {"name", "desc", "price", "rating", "img_url"};
+            Console.WriteLine("Barang yang akna diedit : {0}", _product.id);
+            string[] varList = {"name", "description", "price", "rating", "img_url"};
 
             var productToUpdate = appDbContex.Barang.Find(_product.id);
+
             foreach (var item in varList)
             {
                 var prop = typeof(Barang).GetProperty(item);
-                prop.SetValue(productToUpdate, prop.GetValue(_product, null));
+                var value = prop.GetValue(_product, null);
+                prop.SetValue(productToUpdate, value);
             }
 
             productToUpdate.editedAt = DateTime.Now;

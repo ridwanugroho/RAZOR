@@ -4,7 +4,8 @@
 <h1>@ViewData["Title"]</h1>
 
 <div class="">
-    @{
+    @if(ViewBag.Items != null)
+    {
         var items = ViewBag.Items;
         foreach (var i in items)
         {
@@ -27,7 +28,10 @@
             </div>
         }
     }
-    <h2>Total Price : @ViewBag.totalPrice</h2>
+    <div class="d-flex">
+        <h2 class="p-2">Total Price : @ViewBag.totalPrice</h2>
+        <a class="btn btn-primary ml-auto p2" href="https://localhost:5001/purchase">Process</a>
+    </div>
 </div>
 
 <script type="text/javascript">

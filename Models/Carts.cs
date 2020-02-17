@@ -7,14 +7,16 @@ namespace belajarRazor.Models
 {
     public class Carts
     {
-        internal string _Items{get; set;}
-        public double totalPrice{get; set;}
+        public int id{get; set;}
         public int userID{get; set;}
+        public double totalPrice{get; set;}
+        [JsonIgnore]
+        public string _Items{get; set;}
         
         [NotMapped]
-        public Items Items
+        public List<Items> Items
         {
-            get{return _Items == null ? null : JsonConvert.DeserializeObject<Items>(_Items);}
+            get{return _Items == null ? null : JsonConvert.DeserializeObject<List<Items>>(_Items);}
             set{_Items = JsonConvert.SerializeObject(value);}
         }
     }

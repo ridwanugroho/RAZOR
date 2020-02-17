@@ -1,0 +1,114 @@
+@{
+    ViewData["Title"] = "Purchase";
+}
+
+@model belajarRazor.Models.Carts
+
+<div class="">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">No</th>
+                <th scope="col">Nama Item</th>
+                <th scope="col">Harga per satuan</th>
+                <th scope="col">Jumlah</th>
+                <th scope="col">Sub total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{int i = 1;}
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <th scope="row">@i</th>
+                    <td>@item.Item.name</td>
+                    <td>@item.Item.price</td>
+                    <td>@item.quantity</td>
+                    <td>@(item.quantity * item.Item.price)</td>
+                </tr>
+
+                i++;
+            }
+        </tbody>
+    </table>
+    <div class="right-2-div">
+        <div><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editorModal">Confirm & Process</button></div>
+        <div>Total Price : @Model.totalPrice</div>
+    </div>  
+</div>
+
+<div class="modal fade" id="editorModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Add/Edit Products</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @* <form id="modal-form" asp-action="AddProduct" asp-controller="Product" method="post"> *@
+                <form id="modal-form" action="https://localhost:5001/purchase/ProcessOrder" method="post">
+                    <label for="modal-name">Nama Penerima</label>
+                    <input id="modal-name" type="text" name="name" placeholder="name" class="form-control">
+                    <label for="modal-name">Alamat</label>
+                    <input id="modal-address" type="text" name="address" placeholder="Alamat lengkap (TR-RW)" class="form-control">
+                    <div class="center-2-div">
+                        <div>
+                            <label for="modal-name">Kode Pos</label>
+                            <input id="modal-post" type="text" name="postal_code" placeholder="Kode pos" class="form-control">
+                        </div>
+                        <div>
+                            <label for="modal-name">Telepon</label>
+                            <input id="modal-phone" type="text" name="phone" placeholder="081XXXX" class="form-control">
+                        </div>
+                    </div>
+                    <label for="modal-shipment">Pengiriman</label>
+                    <select id="modal-shipment" name="shipment" class="browser-default custom-select">
+                        <option selected>Pilih Pengiriman</option>
+                        <option value="1">JNE-REG</option>
+                        <option value="2">JNE-YES</option>
+                        <option value="3">JNT-REG</option>
+                        <option value="4">POS-Kilat</option>
+                        <option value="5">Ambil di toko</option>
+                    </select>
+                    <label for="modal-payment">Pembayaran</label>
+                    <select id="modal-payment" name="payment" class="browser-default custom-select">
+                        <option selected>Pilih metode pembayaran</option>
+                        <option value="1">BNI virtual</option>
+                        <option value="2">BCA virtual</option>
+                        <option value="3">mandiri virtual</option>
+                        <option value="4">GO-Pay</option>
+                    </select>
+                    <div class="d-flex justify-content-center">
+                        <input id="modal-snd-btn" type="submit" value="Proses" class="btn btn-primary">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    function submitUpdate(btn)
+    {
+        var id = btn.id
+        id = id.substring(4, id.length);
+        var inputId = 'input-'+ id;
+        var val = document.getElementById(inputId).value;
+        var url = "https://localhost:5001/Cart/update?id=" + id + "&val=" + val;
+        window.location.href = url;
+    }  
+
+    function removeItem(btn)
+    {
+        var id = btn.id
+        id = id.substring(7, id.length);
+        var url = "https://localhost:5001/Cart/remove/"+id;
+        window.location.href = url;
+    }    
+</script>

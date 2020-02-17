@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using belajarRazor.Data;
 
 namespace belajarRazor.Migrations
 {
     [DbContext(typeof(AppDbContex))]
-    partial class AppDbContexModelSnapshot : ModelSnapshot
+    [Migration("20200217040156_set-va-number")]
+    partial class setvanumber
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,9 +94,6 @@ namespace belajarRazor.Migrations
                     b.Property<int?>("Userid")
                         .HasColumnType("int");
 
-                    b.Property<string>("_ItemsDetail")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("courir")
                         .HasColumnType("nvarchar(max)");
 
@@ -113,12 +112,6 @@ namespace belajarRazor.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("_actions")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("_va_numbers")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("currency")
                         .HasColumnType("nvarchar(max)");
