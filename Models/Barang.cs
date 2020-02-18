@@ -13,5 +13,6 @@ namespace belajarRazor.Models
         public int rating{get; set;}
         public DateTime createdAt{get; set;}
         public DateTime editedAt{get; set;}
+        public int UserID{get; set;}
     }
 }

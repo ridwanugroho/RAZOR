@@ -8,9 +8,9 @@ namespace belajarRazor.Models
     {
         public int Id{get; set;}
         public User User{get; set;}
-        public string Address{get; set;}
-        public string courir{get; set;}
-        public string PaymentMethod{get; set;}
+        public string Address{get; set;} = "NULL";
+        public string courir{get; set;} = "NULL";
+        public string PaymentMethod{get; set;} = "NULL";
         [JsonIgnore]
         public string _ItemsDetail{get; set;}
         public TransactionDetails TransactionsDetail{get; set;}

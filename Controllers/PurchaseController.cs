@@ -38,8 +38,8 @@ namespace belajarRazor.Controllers
         public async Task<IActionResult> ProcessOrder(IFormCollection prc)
         {
             int userId = HttpContext.Session.GetInt32("id").GetValueOrDefault();
-            // var cartToProcess = (from i in appDbContex.Carts where i.userID == userId select i).FirstOrDefault();
-            var cartToProcess = appDbContex.Carts.SingleOrDefault(u=>u.userID == userId);
+            var cartToProcess = (from i in appDbContex.Carts where i.userID == userId select i).FirstOrDefault();
+            // var cartToProcess = appDbContex.Carts.SingleOrDefault(u=>u.userID == userId);
 
             var prcToProcess = new Purchases
             {
@@ -54,6 +54,7 @@ namespace belajarRazor.Controllers
             appDbContex.SaveChanges();
 
             string postBody = generatePostBody(prcToProcess);
+            Console.WriteLine(postBody);
             string token = "SB-Mid-server-HGIgu1G5Ny6GYizsGIbSm1uH:";
             string apiUrl = "https://api.sandbox.midtrans.com/v2/charge";
             var response = await ReqObj(apiUrl, HttpMethod.Post, postBody, token);
@@ -71,7 +72,11 @@ namespace belajarRazor.Controllers
             }
             
             else
+            {
+                appDbContex.Purchases.Remove(prcToProcess);
+                appDbContex.SaveChanges();
                 return Ok(transaction);
+            }
 
             return RedirectToAction("TransactionDetail", "Purchase");
         }
@@ -217,11 +222,23 @@ namespace belajarRazor.Controllers
             return await response.Content.ReadAsStringAsync();
         }
     
+        private int getAuth()
+        {
+            if(HttpContext.Session.GetString("JWToken") != null)
+                return 1;
+
+            else
+                return 0;
+        }
+
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 
-        [Authorize]
+        // [Authorize]
         public async Task<IActionResult> TransactionDetail()
         {
+            if (getAuth() == 0)
+                return View("_LoginAttemp");
+
             int userId = HttpContext.Session.GetInt32("id").GetValueOrDefault();
             var transactions = from t in appDbContex.Purchases.Include(t=>t.TransactionsDetail)
                                .Include(u=>u.User) where t.User.id == userId select t;
@@ -237,6 +254,7 @@ namespace belajarRazor.Controllers
             }
 
             appDbContex.SaveChanges();
+            ViewBag.auth = getAuth();
 
             return View("PurchaseDetail", transactions.ToList());
         }

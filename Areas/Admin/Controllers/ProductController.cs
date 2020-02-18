@@ -27,26 +27,20 @@ namespace belajarRazor.Areas.Admin.Controllers
             this.appDbContex = appDbContex;
         }
 
-        // [Authorize]
+        [Authorize]
         public IActionResult Index(int ? perpage, int? page, int ? order, string filter="")
         {
-            var items1 = new List<Barang>();
+            int userId = HttpContext.Session.GetInt32("id").GetValueOrDefault();
+            var items = (from i in appDbContex.Barang where i.UserID == userId select i).ToList();
 
             if(!string.IsNullOrEmpty(filter) || !string.IsNullOrWhiteSpace(filter))
             {
-                var products = from i in appDbContex.Barang where i.name.Contains(filter) || i.description.Contains(filter) select i;
-                items1 = products.ToList();
-            }
-
-            else
-            {
-                var products = from i in appDbContex.Barang select i;
-                items1 = products.ToList();
+                items = (from i in items where i.name.Contains(filter) || i.description.Contains(filter) select i).ToList();
             }
 
             if(order != null)
             {
-                items1 = orderBy(items1, order);
+                items = orderBy(items, order);
             }
 
             ViewBag.auth = getAuth();
@@ -58,11 +52,11 @@ namespace belajarRazor.Areas.Admin.Controllers
             if(perpage.HasValue)
                 _perPage = perpage.Value;
 
-			var pager = new Pager(items1.Count(), page, _perPage);
+			var pager = new Pager(items.Count(), page, _perPage);
 			
 			var viewModel = new IndexViewModel
 			{
-				Items = items1.Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize),
+				Items = items.Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize),
 				Pager = pager
 			};
 			
@@ -83,6 +77,7 @@ namespace belajarRazor.Areas.Admin.Controllers
         [Authorize]
         public IActionResult ProccessUpload([FromForm(Name="files")] IFormFile files)
         {
+            int userId = HttpContext.Session.GetInt32("id").GetValueOrDefault();
             Console.WriteLine(files.FileName);
             try
             {
@@ -101,7 +96,10 @@ namespace belajarRazor.Areas.Admin.Controllers
                         description = singleData[1],
                         img_url = singleData[2],
                         price = Convert.ToDouble(singleData[3]),
-                        rating = Convert.ToInt32(singleData[4])
+                        rating = Convert.ToInt32(singleData[4]),
+                        UserID = userId,
+                        createdAt = DateTime.Now,
+                        editedAt = DateTime.Now
                     };
 
                     appDbContex.Barang.Add(toAdd);
@@ -128,6 +126,7 @@ namespace belajarRazor.Areas.Admin.Controllers
         [Authorize]
         public IActionResult AddProduct(IFormCollection _product)
         {
+            int userId = HttpContext.Session.GetInt32("id").GetValueOrDefault();
             var product = new Barang()
             {
                 name = _product["name"],
@@ -136,7 +135,8 @@ namespace belajarRazor.Areas.Admin.Controllers
                 price = Convert.ToDouble(_product["price"]),
                 rating = Convert.ToInt32(_product["rating"]),
                 createdAt = DateTime.Now,
-                editedAt = DateTime.Now
+                editedAt = DateTime.Now,
+                UserID = userId
             };
 
             appDbContex.Barang.Add(product);
@@ -151,14 +151,12 @@ namespace belajarRazor.Areas.Admin.Controllers
             var product = appDbContex.Barang.Find(id);
             ViewBag.item = product;
 
-
             return View();
         }
 
         [Authorize]
         public IActionResult Update(Barang _product)
         {
-            Console.WriteLine("Barang yang akna diedit : {0}", _product.id);
             string[] varList = {"name", "description", "price", "rating", "img_url"};
 
             var productToUpdate = appDbContex.Barang.Find(_product.id);

@@ -5,19 +5,21 @@
 <h4 style="coloe: red">
     @info
 </h4>
-@using (Html.BeginForm("Login", "User", FormMethod.Post))
-{
-    <table>
-        <tr>
-            <td>Enter email: </td>
-            <td>@Html.TextBox("email")</td>
-        </tr>
-        <tr>
-            <td>Enter password: </td>
-            <td>@Html.Password("password")</td>
-        </tr>
-        <tr>
-            <td colspan="2"><input type="submit" value="Submit"></td>
-        </tr>
-    </table>
-}
+
+<div style="width: 300px">
+    <form id="register-user" action="~/user/Login" method="post">
+        <div class="form-group">
+            <label for="email">Email </label>
+            <input name="email" type="email" class="form-control" id="email"placeholder="Enter email">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+</div>
+
+Belum punya akun? <br>
+<a href="~/user/register">Register</a>

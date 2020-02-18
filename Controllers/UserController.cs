@@ -37,18 +37,34 @@ namespace belajarRazor.Controllers
             return View("Login");
         }
 
-        [HttpPost("register")]
-        public IActionResult RegisterUser([FromBody] User user)
+        public IActionResult Register()
         {
-            var existUser = from _user in appDbContex.User select _user.username;
+            return View();
+        }
 
-            if(existUser.Contains(user.username))
+        public IActionResult RegisterUser(User user)
+        {
+            var existUser = from _user in appDbContex.User select _user;
+            var existUsername = from n in existUser select n.username;
+            if(existUsername.Contains(user.username))
             {
                 return Ok(new
                 {
                     ERROR = "Username Exist!"
                 });
             }
+
+            var existEmail = from e in existUser select e.email;
+            if(existUsername.Contains(user.username))
+            {
+                return Ok(new
+                {
+                    ERROR = "Email Exist!"
+                });
+            }
+
+            user.createdAt = DateTime.Now;
+            user.updatedAt = DateTime.Now;
 
             appDbContex.User.Add(user);
             appDbContex.SaveChanges();

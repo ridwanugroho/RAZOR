@@ -1,0 +1,38 @@
+@model List<belajarRazor.Models.Sales>
+
+
+<div class="">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">No</th>
+                <th scope="col">Nama Barang</th>
+                <th scope="col">Jumlah pembelian</th>
+                <th scope="col">ID Order</th>
+                <th scope="col">Pembeli</th>
+                <th scope="col">Waktu pembelian</th>
+                <th scope="col">Status transaksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{int i = 1;}
+            @foreach (var trans in Model)
+            {
+                <tr>
+                    <th scope="row">@i</th>
+                    <td>@trans.Item.name</td>
+                    <td>@trans.Quantity</td>
+                    <td>@trans.OrderID</td>
+                    <td>@trans.Buyer.username</td>
+                    <td>@trans.TransactionTime</td>
+                    <td>@trans.TransactionStatus</td>
+                </tr>
+
+                i++;
+            }
+        </tbody>
+    </table>
+    <div class="right-2-div">
+        <div><a name="trans-refresh" type="action" class="btn btn-primary" href="~/Admin/sales")>Refresh</a></div>
+    </div>  
+</div>
