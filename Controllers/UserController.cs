@@ -63,13 +63,14 @@ namespace belajarRazor.Controllers
                 });
             }
 
+            user.password = Hashing.HashPassword(user.password);
             user.createdAt = DateTime.Now;
             user.updatedAt = DateTime.Now;
 
             appDbContex.User.Add(user);
             appDbContex.SaveChanges();
 
-            return Ok(user);
+            return RedirectToAction("Index", "Home");
         }
 
         /////////////////////////////// LOGIN LOGOUT  //////////////////////////////
@@ -121,7 +122,7 @@ namespace belajarRazor.Controllers
 
             if(user.FirstOrDefault() != null)
             {
-                if(user.First().password == user_input.password)
+                if(Hashing.ValidatePassword(user_input.password, user.First().password))
                     return user.First();
             }
 

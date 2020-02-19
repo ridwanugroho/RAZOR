@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,21 +55,35 @@ namespace belajarRazor.Controllers
             appDbContex.SaveChanges();
 
             string postBody = generatePostBody(prcToProcess);
-            Console.WriteLine(postBody);
             string token = "SB-Mid-server-HGIgu1G5Ny6GYizsGIbSm1uH:";
             string apiUrl = "https://api.sandbox.midtrans.com/v2/charge";
             var response = await ReqObj(apiUrl, HttpMethod.Post, postBody, token);
+            Console.WriteLine("responde : \n{0}", response);
             
             var transaction = JsonConvert.DeserializeObject<TransactionDetails>(response);
             if(transaction.status_code == "201")
             {
-                Console.WriteLine(response);
                 var tempPrc = appDbContex.Purchases.Find(prcToProcess.Id);
-                tempPrc.TransactionsDetail = transaction;
                 
-                appDbContex.Carts.Remove(cartToProcess);
+                if(tempPrc.PaymentMethod == "go-pay")
+                    transaction.va_numbers.First().va_number = "---";
+                
+                if(tempPrc.PaymentMethod == "mandiri")
+                    transaction.va_numbers.First().va_number = transaction.bill_key;
 
+                tempPrc.TransactionsDetail = transaction;
+
+                appDbContex.Carts.Remove(cartToProcess);
+                
                 appDbContex.SaveChanges();
+
+                var mailBody = $@"<h1>Hai {tempPrc.User.username}!</h1><br>
+                Segera selesaian pembayaran dengan virtual akun {transaction.va_numbers[0].bank} dengan nomor<br>
+                <h3>{transaction.va_numbers[0].va_number}</h3>";
+
+                var sendThread = new Thread(() => MailController.sendMail("admin@tokoaneh.com", prcToProcess.User.email, 
+                                                                          "Purchase Confirmation", mailBody));
+                sendThread.Start();
             }
             
             else
@@ -167,6 +182,16 @@ namespace belajarRazor.Controllers
 
             else if(prc.PaymentMethod == "mandiri")
             {
+                var item = new
+                {
+                    id = "items",
+                    price = prc.ItemsDetail.totalPrice,
+                    quantity = 1,
+                    name = "item_name"
+                };
+
+                object[] listItem = { item };
+
                 var transaction = new
                 {
                     payment_type = "echannel",
@@ -175,6 +200,13 @@ namespace belajarRazor.Controllers
                         order_id = prc.User.id.ToString() + "-ORD-" +  prc.Id.ToString(),
                         gross_amount = prc.ItemsDetail.totalPrice,
                     },
+                    item_details = listItem,
+                    echannel = new 
+                    {
+                        bill_info1 = "Payment For:",
+                        bill_info2 = "debt"
+                    }
+
                 };
 
                 return JsonConvert.SerializeObject(transaction);
@@ -247,14 +279,23 @@ namespace belajarRazor.Controllers
             string apiUrl = "https://api.sandbox.midtrans.com/v2/";
             foreach(var tr in transactions)
             {
-                string orderId = tr.TransactionsDetail.order_id.ToString();
-                var status = await ReqObj(apiUrl+orderId+"/status", HttpMethod.Get, "", token);
-                var temp = appDbContex.Purchases.Find(tr.Id);
-                temp.TransactionsDetail.transaction_status = getTransactionStatus(status);
+                try
+                {
+                    string orderId = tr.TransactionsDetail.order_id.ToString();
+                    var status = await ReqObj(apiUrl+orderId+"/status", HttpMethod.Get, "", token);
+                    var temp = appDbContex.Purchases.Find(tr.Id);
+                    temp.TransactionsDetail.transaction_status = getTransactionStatus(status);
+                }
+                catch (System.Exception)
+                {
+                    //
+                }
             }
 
             appDbContex.SaveChanges();
             ViewBag.auth = getAuth();
+
+            ViewBag.transactions = transactions.ToList();
 
             return View("PurchaseDetail", transactions.ToList());
         }
