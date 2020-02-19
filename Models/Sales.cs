@@ -4,6 +4,7 @@ namespace belajarRazor.Models
 {
     public class Sales
     {
+        public int PurchaseID{get; set;}
         public Barang Item{get; set;}
         public User Buyer{get; set;}
         public string OrderID{get; set;}

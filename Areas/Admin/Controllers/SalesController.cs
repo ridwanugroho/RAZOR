@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using System.IO;
+using System.Net.Http;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -13,7 +14,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
 // using PagedList;
 using belajarRazor.Data;
-
+using belajarRazor.Controllers;
 
 namespace belajarRazor.Areas.Admin.Controllers
 {
@@ -27,7 +28,7 @@ namespace belajarRazor.Areas.Admin.Controllers
             this.appDbContex = appDbContex;
         }
 
-        public IActionResult Index(int ? ByBuyer, string singleItem)
+        public async Task<IActionResult> Index(int ? ByBuyer, string singleItem)
         {
             var adminId = HttpContext.Session.GetInt32("id").GetValueOrDefault();
             
@@ -40,6 +41,20 @@ namespace belajarRazor.Areas.Admin.Controllers
                 adminSoldList = filterPerItem(adminSoldList, singleItem);
 
             ViewBag.auth = getAuth();
+
+            string token = "SB-Mid-server-HGIgu1G5Ny6GYizsGIbSm1uH:";
+            string apiUrl = "https://api.sandbox.midtrans.com/v2/";
+            for(int i=0; i<adminSoldList.Count(); i++)
+            {
+                var orderId = adminSoldList[i].OrderID;
+                var status = await PurchaseController.ReqObj(apiUrl+orderId+"/status", HttpMethod.Get, "", token);
+                var temp = appDbContex.Purchases.Find(adminSoldList[i].PurchaseID);
+                var transactionStatus = PurchaseController.getTransactionStatus(status);
+                temp.TransactionsDetail.transaction_status = transactionStatus;
+                adminSoldList[i].TransactionStatus = transactionStatus;
+            }
+
+            appDbContex.SaveChanges();
             
             return View(adminSoldList);
         }
@@ -59,6 +74,7 @@ namespace belajarRazor.Areas.Admin.Controllers
                     {
                         var temp = new Sales()
                         {
+                            PurchaseID = purchase.Id,
                             Item = item.Item,
                             Buyer = purchase.User,
                             OrderID = purchase.TransactionsDetail.order_id,

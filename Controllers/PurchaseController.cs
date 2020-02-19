@@ -235,7 +235,7 @@ namespace belajarRazor.Controllers
             return null;
         }
 
-        static async Task<string> ReqObj(string url, HttpMethod methode, string data="", string token="")
+        public static async Task<string> ReqObj(string url, HttpMethod methode, string data="", string token="")
         {
             HttpClientHandler handler = new HttpClientHandler();
             handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
@@ -272,19 +272,21 @@ namespace belajarRazor.Controllers
                 return View("_LoginAttemp");
 
             int userId = HttpContext.Session.GetInt32("id").GetValueOrDefault();
-            var transactions = from t in appDbContex.Purchases.Include(t=>t.TransactionsDetail)
-                               .Include(u=>u.User) where t.User.id == userId select t;
+            var transactions = (from t in appDbContex.Purchases.Include(t=>t.TransactionsDetail)
+                               .Include(u=>u.User) where t.User.id == userId select t).ToList();
             
             string token = "SB-Mid-server-HGIgu1G5Ny6GYizsGIbSm1uH:";
             string apiUrl = "https://api.sandbox.midtrans.com/v2/";
-            foreach(var tr in transactions)
+            for(int i=0; i<transactions.Count(); i++)
             {
                 try
                 {
-                    string orderId = tr.TransactionsDetail.order_id.ToString();
+                    string orderId = transactions[i].TransactionsDetail.order_id.ToString();
                     var status = await ReqObj(apiUrl+orderId+"/status", HttpMethod.Get, "", token);
-                    var temp = appDbContex.Purchases.Find(tr.Id);
-                    temp.TransactionsDetail.transaction_status = getTransactionStatus(status);
+                    var temp = appDbContex.Purchases.Find(transactions[i].Id);
+                    var transactionStatus = getTransactionStatus(status);
+                    temp.TransactionsDetail.transaction_status = transactionStatus;
+                    transactions[i].TransactionsDetail.transaction_status = transactionStatus;
                 }
                 catch (System.Exception)
                 {
@@ -300,7 +302,7 @@ namespace belajarRazor.Controllers
             return View("PurchaseDetail", transactions.ToList());
         }
 
-        private string getTransactionStatus(string response)
+        public static string getTransactionStatus(string response)
         {
             var status = JsonConvert.DeserializeObject<Dictionary<string, object>>(response);
             return status["transaction_status"].ToString();
