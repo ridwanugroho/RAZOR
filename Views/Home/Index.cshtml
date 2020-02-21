@@ -22,14 +22,12 @@
                 <option value="7">Lastest Updated</option>
                 <option value="8">Older Update</option>
             </select>
-            @* <input type="submit" value="Submit"> *@
             <input id="order-btn" type="button" class="btn btn-danger" onclick="javascript: setOrder(this)" value="Set" />
         </form>
         </div>
         <div>
             <form>
                 <input id="searchFilter" type="text" placeholder="search" name="filter" value="@ViewBag.filter" style="width: 200px; height: 30px">
-                @* <button type="submit">Go</button> *@
                 <input id="search-btn" type="button" class="btn btn-danger" onclick="javascript: setSearch(this)" value="Go" />
             </form>
         </div>
@@ -55,7 +53,6 @@
             </div>
         </div>
     }
-    @* pager *@
     <div class="pagination-div">
         <div name="page-list-count">
             @if(Model.Pager.EndPage>1)
@@ -98,58 +95,118 @@
 
 </div>
 
+<input type="text" id="tujuan">
+<input type="text" id="message">
 
-<script type="text/javascript">
-    function setOrder(btn)
-    {
-        if(document.getElementById("order-sel").value != 0)
+<button id="btn">submit</button>
+
+<div id="chatbox">
+
+</div>
+
+
+@section Scripts
+{
+    <script type="text/javascript">
+        $(document).ready(function() {
+            let userId = 0;
+            if('@ViewBag.auth' != 0)
+            {
+                console.log("ada usernya");
+                userId = Cookies.get('userId');
+                console.log(userId);
+            }
+
+            if('@ViewBag.auth' != 0)
+            {
+                let connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+
+                connection.start().then(function() {
+                    console.log("Socket : SignalR started");
+                    let userId = '@ViewBag.auth';
+                    connection.invoke("bindConId", userId).catch(err=>{
+                        return console.log(err.toString());
+                    });
+
+                    $('#btn').on('click', function(){
+                        let message = $('#message').val();
+                        let to = $('#tujuan').val();
+
+                        connection.invoke("SendChatMessage",userId.toString(), to, message).catch(err=>{
+                            return console.error(err.toString());
+                        })
+                    })
+                }).catch(function(err) {
+                    return console.error(err.toString());
+                });
+
+                connection.on("GotMessage", function(message){
+                    $('#chatbox').append(message);
+                });
+
+                $(window).bind('beforeunload', function(){
+                    connection.invoke("removeConId", userId.toString()).catch(err=>{
+                        return console.log(err.toString());
+                    })
+                });
+            }
+
+            else{
+                console.log("harus login dulu");
+            }
+        })
+
+        function setOrder(btn)
         {
-            var filter = '@ViewBag.filter';
+            if(document.getElementById("order-sel").value != 0)
+            {
+                var filter = '@ViewBag.filter';
+                var perPage = '@ViewBag.perPage'
+                var orderVal = document.getElementById("order-sel").value;
+                var url = "https://localhost:5001/Product/Index?order=";
+                url += orderVal + "&filter=" + filter + "&perpage=" + perPage;
+                window.location.href = url;
+            }
+        }
+
+        function setSearch(btn)
+        {
+            var order = '@ViewBag.order';
             var perPage = '@ViewBag.perPage'
-            var orderVal = document.getElementById("order-sel").value;
-            var url = "https://localhost:5001/Product/Index?order=";
-            url += orderVal + "&filter=" + filter + "&perpage=" + perPage;
+            var filterVal = document.getElementById("searchFilter").value;
+            var url = "https://localhost:5001/Product/Index?filter=";
+            url += filterVal + "&order=" + order + "&perpage=" + perPage;
             window.location.href = url;
         }
-    }
 
-    function setSearch(btn)
-    {
-        var order = '@ViewBag.order';
-        var perPage = '@ViewBag.perPage'
-        var filterVal = document.getElementById("searchFilter").value;
-        var url = "https://localhost:5001/Product/Index?filter=";
-        url += filterVal + "&order=" + order + "&perpage=" + perPage;
-        window.location.href = url;
-    }
-
-    function setLastOrderVal()
-    {
-        var selValue = '@ViewBag.order';
-        if(selValue != "")
-            document.getElementById("order-sel").value = selValue;
-    }
-
-    function setItemPerPage()
-    {
-        var order = '@ViewBag.order';
-        var filter = '@ViewBag.filter';
-        var perPage = document.getElementById("item-per-page").value;
-        url = "https://localhost:5001/Product/Index?perpage=";
-        url += perPage + "&filter=" + filter + "&order=" + order;
-        window.location.href = url;
-    }
-
-    window.onload = setLastOrderVal;
-    
-    var input = document.getElementById("searchFilter");
-    input.addEventListener("keyup", function(event) 
-    {
-        if (event.keyCode === 13) 
+        function setLastOrderVal()
         {
-            console.log("enter");
-            event.preventDefault();
-            document.getElementById("search-btn").click();
+            var selValue = '@ViewBag.order';
+            if(selValue != "")
+                document.getElementById("order-sel").value = selValue;
         }
-    });
-</script>
+
+        function setItemPerPage()
+        {
+            var order = '@ViewBag.order';
+            var filter = '@ViewBag.filter';
+            var perPage = document.getElementById("item-per-page").value;
+            url = "https://localhost:5001/Product/Index?perpage=";
+            url += perPage + "&filter=" + filter + "&order=" + order;
+            window.location.href = url;
+        }
+
+        window.onload = setLastOrderVal;
+        
+        var input = document.getElementById("searchFilter");
+        input.addEventListener("keyup", function(event) 
+        {
+            if (event.keyCode === 13) 
+            {
+                console.log("enter");
+                event.preventDefault();
+                document.getElementById("search-btn").click();
+            }
+        });
+    </script>
+}

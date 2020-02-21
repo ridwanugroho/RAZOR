@@ -96,7 +96,16 @@
 </div>
 
 
+@section Scripts
+{
 <script type="text/javascript">
+    $(document).ready(function(){
+        let userId = '@ViewBag.auth';
+        console.log(userId);
+        if(userId != 0)
+            Cookies.set('userId', userId);
+    });
+
     function setOrder(btn)
     {
         if(document.getElementById("order-sel").value != 0)
@@ -150,3 +159,4 @@
         }
     });
 </script>
+}

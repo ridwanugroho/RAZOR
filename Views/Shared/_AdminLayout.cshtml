@@ -31,7 +31,7 @@
                     <input type="image" src="~/user.png" class="user-btn">
                     <div class="dropdown-content">
                         @if(ViewBag.auth == 0){<a href="https://localhost:5001/user">Login</a>}
-                        @if(ViewBag.auth == 1){
+                        @if(ViewBag.auth != 0){
                             <a href="https://localhost:5001/user/logout">Logout</a>
                             <a href="#">Edit product</a>
                         }
@@ -53,7 +53,10 @@
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

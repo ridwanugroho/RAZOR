@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 
@@ -25,11 +26,13 @@ namespace belajarRazor.Controllers
     {
         public AppDbContex appDbContex{get; set;}
         private IConfiguration configuration;
-
-        public UserController(AppDbContex appDbContex, IConfiguration configuration)
+        private readonly ILogger logger;
+        
+        public UserController(AppDbContex appDbContex, IConfiguration configuration, ILogger<UserController> logger)
         {
             this.appDbContex = appDbContex;
             this.configuration = configuration;
+            this.logger = logger;
         }
 
         public IActionResult Index()
@@ -84,8 +87,8 @@ namespace belajarRazor.Controllers
                 password = user_inp["password"]
             };
 
-            Console.WriteLine(_user.email);
-            Console.WriteLine(_user.password);
+            logger.LogInformation("Login attemp from {0}", _user.email);
+
 
             var user = AuthenticatedUser(_user);
 

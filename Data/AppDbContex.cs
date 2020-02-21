@@ -11,6 +11,7 @@ namespace belajarRazor.Data
         public DbSet<Carts> Carts{get; set;}
         public DbSet<Purchases> Purchases{get; set;}
         public DbSet<TransactionDetails> TransactionDetail{get; set;}
+        public DbSet<Conversation> Conversations{get; set;}
         
         public AppDbContex(DbContextOptions options) : base(options)
         {

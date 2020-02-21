@@ -78,7 +78,7 @@ namespace belajarRazor.Controllers
         {
             Console.WriteLine("token : {0}", (HttpContext.Session.GetString("JWToken")));
             if(HttpContext.Session.GetString("JWToken") != null)
-                return 1;
+                return HttpContext.Session.GetInt32("id").Value;
 
             else
                 return 0;

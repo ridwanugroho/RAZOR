@@ -119,7 +119,7 @@ namespace belajarRazor.Controllers
         private int getAuth()
         {
             if(HttpContext.Session.GetString("JWToken") != null)
-                return 1;
+                return HttpContext.Session.GetInt32("id").Value;
 
             else
                 return 0;

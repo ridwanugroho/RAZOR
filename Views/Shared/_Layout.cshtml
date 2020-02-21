@@ -6,6 +6,80 @@
     <title>@ViewData["Title"] - belajarRazor</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <style>    
+        .open-button {
+        background-color: #555;
+        color: white;
+        padding: 16px 20px;
+        border: none;
+        cursor: pointer;
+        opacity: 0.8;
+        position: fixed;
+        bottom: 5px;
+        right: 5px;
+        width: 100px;
+        }
+
+        /* The popup chat - hidden by default */
+        .chat-popup {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        right: 15px;
+        border: 3px solid #f1f1f1;
+        z-index: 9;
+        }
+
+        /* Add styles to the form container */
+        .form-container {
+        max-width: 300px;
+        padding: 10px;
+        background-color: white;
+        }
+
+        /* Full-width textarea */
+        .form-container textarea {
+        width: 100%;
+        padding: 15px;
+        margin: 5px 0 22px 0;
+        border: none;
+        background: #f1f1f1;
+        resize: none;
+        min-height: 200px;
+        }
+
+        /* When the textarea gets focus, do something */
+        .form-container textarea:focus {
+        background-color: #ddd;
+        outline: none;
+        }
+
+        /* Set a style for the submit/send button */
+        .form-container .btn {
+        background-color: #4CAF50;
+        color: white;
+        padding: 16px 20px;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        margin-bottom:10px;
+        opacity: 0.8;
+        }
+
+        /* Add a red background color to the cancel button */
+        .form-container .cancel {
+        background-color: red;
+        }
+
+        /* Add some hover effects to buttons */
+        .form-container .btn:hover, .open-button:hover {
+        opacity: 1;
+        }
+
+        .msg-box {
+            height: 30px;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -34,7 +108,7 @@
                     <input type="image" src="~/user.png" class="user-btn">
                     <div class="dropdown-content">
                         @if(ViewBag.auth == 0){<a href="https://localhost:5001/user">Login</a>}
-                        @if(ViewBag.auth == 1){
+                        @if(ViewBag.auth != 0){
                             <a href="https://localhost:5001/user/logout">Logout</a>
                         }
                     </div>
@@ -45,18 +119,111 @@
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
+
+            @if(ViewBag.auth != 0)
+            {    
+                <button class="open-button" onclick="javascript: openForm()">Chat</button>
+                <div class="chat-popup" id="myForm">
+                    <form action="/action_page.php" class="form-container">
+                        <label  for="reciever">To</label>
+                        <input id="reciever" type="tet" placeholder="Reciever" onfocusout="javascript: validateReciever()">
+                        <span id="error-reciever">XXX</span><br>
+                        <label for="msg"><b>Message</b></label><br>
+                        <div id="msg-history">
+                        
+                        </div>
+                        <textarea id="msg" placeholder="Type message.." name="msg" class="msg-box" required></textarea>
+
+                        <button type="button" id="send-msg-btn" class="btn" onclick="javascript: sendMessage()">Send</button>
+                        <button type="button" class="btn cancel" onclick="javascript: closeForm()">Close</button>
+                    </form>
+                </div>
+            }
         </main>
     </div>
     <br><br>
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2020 - belajarRazor - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     @RenderSection("Scripts", required: false)
 </body>
+
+<script type="text/javascript">
+
+    let RecId = 0;
+    $(document).ready(function(){
+        $('#error-reciever').hide();
+        $('#send-msg-btn').prop('disabled', true);
+    });
+
+    function validateReciever()
+    {
+        $('#error-reciever').hide();
+        let user = $('#reciever').val();
+        if(user != '')
+        {
+            let url = "/messaging/getReciever?user=" + user;
+
+            $.get(url, function(data, status){
+                console.log(data);
+                RecId = data.id;
+                getMsgs(data.id);
+                $('#send-msg-btn').prop('disabled', false);
+
+            }).catch(function(err) {
+                $('#error-reciever').show();
+            });
+        }
+    }
+
+    function getMsgs(recId)
+    {
+        let url = '/messaging/GetMsgHistory?recId=' + recId;
+        $.get(url, function(data, status){
+            let msg = '';
+            for(i=0; i<data.length; i++)
+            {
+                if(data[i].identifier == 0)
+                    msg = '<div class="text-right">' + data[i].m + '</div>'
+                
+                else
+                    msg = '<div class="text-left">' + data[i].m + '</div>'
+
+                $('#msg-history').append(msg);
+            }
+
+        }).catch(function(err){
+            console.log(err);
+        });
+    }
+
+    function sendMessage()
+    {
+        let messages = $('#msg').val();
+        if(messages != '')
+        {
+            let url = '/messaging/SendMessage?recId=' + RecId + '&msg=' + messages;
+            $.get(url, function(data, status){
+                console.log(data);
+            
+            }).catch(function(err){
+                console.log(err);
+            });
+        }
+    }
+
+    function openForm() {
+    document.getElementById("myForm").style.display = "block";
+    }
+
+    function closeForm() {
+    document.getElementById("myForm").style.display = "none";
+    }
+</script>
+
+
 </html>
