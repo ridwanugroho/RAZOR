@@ -134,7 +134,7 @@
                         </div>
                         <textarea id="msg" placeholder="Type message.." name="msg" class="msg-box" required></textarea>
 
-                        <button type="button" id="send-msg-btn" class="btn" onclick="javascript: sendMessage()">Send</button>
+                        <button type="button" id="send-msg-btn" class="btn">Send</button>
                         <button type="button" class="btn cancel" onclick="javascript: closeForm()">Close</button>
                     </form>
                 </div>
@@ -158,6 +158,59 @@
     $(document).ready(function(){
         $('#error-reciever').hide();
         $('#send-msg-btn').prop('disabled', true);
+
+        //fungsi web socket
+        let userId = 0;
+        if('@ViewBag.auth' != 0)
+        {
+            console.log("ada usernya");
+            userId = Cookies.get('userId');
+            console.log(userId);
+        }
+
+        if('@ViewBag.auth' != 0)
+        {
+            let connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+
+            connection.start().then(function() {
+                console.log("Socket : SignalR started");
+                let userId = '@ViewBag.auth';
+                connection.invoke("bindConId", userId).catch(err=>{
+                    return console.log(err.toString());
+                });
+
+                $('#send-msg-btn').on('click', function(){
+                    let message = $('#msg').val();
+
+                    connection.invoke("SendChatMessage", userId.toString(), RecId.toString(), message).catch(err=>{
+                        return console.error(err.toString());
+                    });
+
+                    $('#msg').val("");
+
+                    let msg = '<div class="text-left">' + message + '</div>'
+                    $('#msg-history').append(msg);
+                });
+            }).catch(function(err) {
+                return console.error(err.toString());
+            });
+
+            connection.on("GotMessage", function(message){
+                $('#chatbox').append(message);
+                let msg = '<div class="text-right">' + message + '</div>'
+                    $('#msg-history').append(msg);
+            });
+
+            $(window).bind('beforeunload', function(){
+                connection.invoke("removeConId", userId.toString()).catch(err=>{
+                    return console.log(err.toString());
+                })
+            });
+        }
+
+        else{
+            console.log("harus login dulu");
+        }
     });
 
     function validateReciever()
@@ -169,11 +222,13 @@
             let url = "/messaging/getReciever?user=" + user;
 
             $.get(url, function(data, status){
-                console.log(data);
-                RecId = data.id;
-                getMsgs(data.id);
-                $('#send-msg-btn').prop('disabled', false);
-
+                if(RecId != data.id)
+                {
+                    RecId = data.id;
+                    getMsgs(data.id);
+                    $('#send-msg-btn').prop('disabled', false);
+                }
+                
             }).catch(function(err) {
                 $('#error-reciever').show();
             });
@@ -201,20 +256,6 @@
         });
     }
 
-    function sendMessage()
-    {
-        let messages = $('#msg').val();
-        if(messages != '')
-        {
-            let url = '/messaging/SendMessage?recId=' + RecId + '&msg=' + messages;
-            $.get(url, function(data, status){
-                console.log(data);
-            
-            }).catch(function(err){
-                console.log(err);
-            });
-        }
-    }
 
     function openForm() {
     document.getElementById("myForm").style.display = "block";

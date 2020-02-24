@@ -2,37 +2,53 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+
+using belajarRazor.Data;
+using belajarRazor.Controllers;
+using belajarRazor.Models;
 
 
 namespace belajarRazor.SignalR
 {
     public class ChatHub : Hub
     {
-        private readonly static ConnectionMapping<string> _connections = 
-            new ConnectionMapping<string>();
+        private readonly static ConnectionMapping<string> _connections = new ConnectionMapping<string>();
 
-        public void SendChatMessage(string dari, string to, string message)
+        private readonly ILogger<MessagingController> logger;
+        private AppDbContex appDbContext;
+
+        public ChatHub(ILogger<MessagingController> logger, AppDbContex appDbContex)
         {
-            Console.WriteLine("dari {0}", dari);
-            Console.WriteLine("tujuan {0}", to);
-            Console.WriteLine("pesan {0}", message);
+            this.logger = logger;
+            this.appDbContext = appDbContex;
+        }
 
-
+        public void SendChatMessage(string from, string to, string message)
+        {
             foreach (var connectionId in _connections.GetConnections(to))
+                Clients.Client(connectionId).SendAsync("GotMessage", message);
+
+            var _msg = new Conversation()
             {
-                Console.WriteLine("con ID penerima : {0}", connectionId);
-                
-                Clients.Client(connectionId).SendAsync("GotMessage", $"{dari} : {message}");
-            }
+                From = appDbContext.User.Find(int.Parse(from)),
+                To = appDbContext.User.Find(int.Parse(to)),
+                Message = message,
+                SentTime = DateTime.Now,
+            };
+
+            appDbContext.Conversations.Add(_msg);
+            appDbContext.SaveChanges();
         }
 
         public override Task OnConnectedAsync()
         {
             string name = Context.UserIdentifier;
             string conID = Context.ConnectionId;
-            Console.WriteLine("name : {0}", name);
-            Console.WriteLine("con ID : {0}", conID);
+            logger.LogInformation("name : {0}", name);
+            logger.LogInformation("con ID : {0}", conID);
 
             return base.OnConnectedAsync();
         }
@@ -42,32 +58,10 @@ namespace belajarRazor.SignalR
             _connections.Remove(userId, Context.ConnectionId);
         }
 
-        public string getConID()
-        {
-            return Context.ConnectionId;
-        }
-
         public void bindConId(string UserId)
         {
             if (!_connections.GetConnections(UserId).Contains(Context.ConnectionId))
                 _connections.Add(UserId, Context.ConnectionId);
         }
-
-        public async Task SendMessage(string message, string from, string to)
-        {
-            Console.WriteLine(message);
-            Console.WriteLine(from);
-            Console.WriteLine(to);
-
-            var msg = new 
-            {
-                from = from,
-                to = to,
-                message = message
-            };
-
-            await Clients.All.SendAsync("GotMessage", JsonConvert.SerializeObject(msg));
-        }
-        
     }
 }

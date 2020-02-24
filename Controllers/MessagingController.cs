@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using belajarRazor.Models;
@@ -41,6 +40,10 @@ namespace belajarRazor.Controllers
                             (m.From.id == userId && m.To.id == recId) ||
                             (m.From.id == recId && m.To.id == userId) select m).OrderBy(t=>t.SentTime);
             
+            // var setReadStatThread = new Thread(()=>setReadStatus(recId, myMessages.ToList()));
+            // setReadStatThread.Start();
+            setReadStatus(recId, myMessages.ToList());
+
             var _msg = new List<object>();
 
             foreach (var msg in myMessages)
@@ -84,6 +87,20 @@ namespace belajarRazor.Controllers
             appDbContext.SaveChanges();
 
             return Ok(_msg);
+        }
+    
+        private void setReadStatus(int recId, List<Conversation> msgs)
+        {
+            foreach(var msg in msgs)
+            {
+                if(msg.From.id == recId)
+                {
+                    var temp = appDbContext.Conversations.Find(msg.uuid);
+                    temp.Read = DateTime.Now;
+                }
+            }
+
+            appDbContext.SaveChanges();
         }
     }
 }

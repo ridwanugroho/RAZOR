@@ -123,6 +123,7 @@
 
                 connection.start().then(function() {
                     console.log("Socket : SignalR started");
+
                     let userId = '@ViewBag.auth';
                     connection.invoke("bindConId", userId).catch(err=>{
                         return console.log(err.toString());
